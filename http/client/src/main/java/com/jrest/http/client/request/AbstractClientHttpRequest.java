@@ -43,7 +43,7 @@ public abstract class AbstractClientHttpRequest implements ClientHttpRequest {
             throw new HttpClientException("can`t to use executeAsync() because executorService is null");
         }
         return CompletableFuture.supplyAsync(() -> execute().orElseThrow(() ->
-                        new HttpClientException("Failed processing " + httpRequest.getUrl())),
+                        new HttpClientException("Failed async processing " + httpRequest.getUrl())),
                 executorService);
     }
 }

@@ -16,7 +16,6 @@ public class SocketClientRequest extends AbstractClientHttpRequest {
 
     @Override
     public Optional<HttpResponse> execute() {
-        HttpRequest httpRequest = getHttpRequest();
-        return Optional.empty();
+        return Optional.empty(); // todo
     }
 }
