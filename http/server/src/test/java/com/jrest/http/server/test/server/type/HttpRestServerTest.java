@@ -43,7 +43,7 @@ public class HttpRestServerTest {
                     .build();
         }
         return HttpResponse.builder()
-                .code(ResponseCode.SUCCESS)
+                .code(ResponseCode.OK)
                 .content(ContentBody.fromEntity(
                         UserEntity.builder()
                                 .id(attributeIdOptional.get())

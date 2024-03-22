@@ -23,7 +23,7 @@ public class HttpBrowserServerTest {
         String uri = httpRequest.getUri();
 
         return HttpBrowserResponse.builder()
-                .code(ResponseCode.SUCCESS)
+                .code(ResponseCode.OK)
                 .view(HttpBrowserView.builder()
                         .attachment(WebResource.fromClassLoader(uri + context.getRequestedAttachmentName()))
                         .build())
