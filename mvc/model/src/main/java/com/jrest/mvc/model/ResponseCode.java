@@ -11,10 +11,6 @@ import java.util.Map;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ResponseCode {
 
-    public static ResponseCode fromCode(int httpCode) {
-        return new ResponseCode(httpCode);
-    }
-
     public static final ResponseCode SUCCESS = fromCode(HttpURLConnection.HTTP_OK);
     public static final ResponseCode CREATED = fromCode(HttpURLConnection.HTTP_CREATED);
     public static final ResponseCode NO_CONTENT = fromCode(HttpURLConnection.HTTP_NO_CONTENT);
@@ -55,24 +51,29 @@ public class ResponseCode {
     public static final ResponseCode GATEWAY_TIMEOUT = fromCode(HttpURLConnection.HTTP_GATEWAY_TIMEOUT);
     public static final ResponseCode INVALID_VERSION = fromCode(HttpURLConnection.HTTP_VERSION);
 
+    public static ResponseCode fromCode(int httpCode) {
+        return ResponseCode.create(httpCode, getCodeMessage(httpCode));
+    }
+
+    public static ResponseCode create(int httpCode, String message) {
+        return new ResponseCode(httpCode, message);
+    }
+
     //
 
     private final int code;
+    private final String message;
 
     public ResponseCode add(int add) {
-        return new ResponseCode(code + add);
+        return set(code + add);
     }
 
     public ResponseCode subtract(int subtract) {
-        return new ResponseCode(code - subtract);
+        return set(code - subtract);
     }
 
     public ResponseCode set(int value) {
-        return new ResponseCode(value);
-    }
-
-    public String getMessage() {
-        return getDefaultMessage(this);
+        return new ResponseCode(value, ResponseCode.getCodeMessage(value));
     }
 
     @Override
@@ -124,7 +125,11 @@ public class ResponseCode {
         MESSAGES_BY_CODE.put(HttpURLConnection.HTTP_VERSION, "HTTP Version Not Supported");
     }
 
-    public static String getDefaultMessage(ResponseCode responseCode) {
-        return MESSAGES_BY_CODE.getOrDefault(responseCode.code, MESSAGE_NOT_FOUND);
+    public static String getCodeMessage(ResponseCode responseCode) {
+        return getCodeMessage(responseCode.getCode());
+    }
+
+    private static String getCodeMessage(int responseCode) {
+        return MESSAGES_BY_CODE.getOrDefault(responseCode, MESSAGE_NOT_FOUND);
     }
 }
