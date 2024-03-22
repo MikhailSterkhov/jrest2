@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface HttpBrowserRequest {
+public @interface HttpRequestMapping {
 
-    String[] value() default { };
+    String value() default "/";
 }

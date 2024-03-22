@@ -1,23 +1,16 @@
 package com.jrest.http.server.test.server.type;
 
 import com.jrest.http.server.test.entity.UserEntity;
-import com.jrest.mvc.model.HttpRequest;
-import com.jrest.mvc.model.HttpResponse;
-import com.jrest.mvc.model.ResponseCode;
-import com.jrest.mvc.model.HttpBrowserRequestContext;
-import com.jrest.mvc.model.HttpBrowserResponse;
-import com.jrest.mvc.model.HttpBrowserView;
-import com.jrest.mvc.model.WebResource;
-import com.jrest.mvc.model.ContentBody;
+import com.jrest.mvc.model.*;
 import com.jrest.mvc.persistence.HttpAsync;
-import com.jrest.mvc.persistence.HttpBrowserRequest;
+import com.jrest.mvc.persistence.HttpRequestMapping;
 import com.jrest.mvc.persistence.HttpPost;
 import com.jrest.mvc.persistence.HttpServer;
 
 @HttpServer
 public class HttpBrowserServerTest {
 
-    @HttpBrowserRequest
+    @HttpRequestMapping
     public HttpBrowserResponse callbackAttachments(HttpBrowserRequestContext context) {
         HttpRequest httpRequest = context.getHttpRequest();
         String uri = httpRequest.getUri();

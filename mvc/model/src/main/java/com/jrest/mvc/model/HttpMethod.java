@@ -13,6 +13,8 @@ import java.util.Set;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class HttpMethod {
 
+    public static final HttpMethod UNKNOWN = fromName("");
+
     public static final HttpMethod GET = fromName("GET");
     public static final HttpMethod POST = fromName("POST");
     public static final HttpMethod DELETE = fromName("DELETE");

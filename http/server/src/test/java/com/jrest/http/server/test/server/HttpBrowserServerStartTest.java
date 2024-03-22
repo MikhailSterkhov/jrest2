@@ -14,6 +14,7 @@ public class HttpBrowserServerStartTest {
                 .executorService(Executors.newCachedThreadPool()) // pass for access to @HttpAsync annotation
                 .build();
 
-        httpServer.bindAt(new HttpBrowserServerTest());
+        httpServer.registerRepository(new HttpBrowserServerTest());
+        httpServer.bind();
     }
 }

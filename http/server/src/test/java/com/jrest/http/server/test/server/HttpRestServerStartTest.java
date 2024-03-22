@@ -12,6 +12,7 @@ public class HttpRestServerStartTest {
                 .socketAddress(new InetSocketAddress(8080))
                 .build();
 
-        httpServer.bindAt(new HttpRestServerTest());
+        httpServer.registerRepository(new HttpRestServerTest());
+        httpServer.bind();
     }
 }
