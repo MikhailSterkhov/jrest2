@@ -5,13 +5,14 @@ import lombok.*;
 import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Getter
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ResponseCode {
 
-    public static final ResponseCode SUCCESS = fromCode(HttpURLConnection.HTTP_OK);
+    public static final ResponseCode OK = fromCode(HttpURLConnection.HTTP_OK);
     public static final ResponseCode CREATED = fromCode(HttpURLConnection.HTTP_CREATED);
     public static final ResponseCode NO_CONTENT = fromCode(HttpURLConnection.HTTP_NO_CONTENT);
     public static final ResponseCode ACCEPTED = fromCode(HttpURLConnection.HTTP_ACCEPTED);
@@ -51,12 +52,25 @@ public class ResponseCode {
     public static final ResponseCode GATEWAY_TIMEOUT = fromCode(HttpURLConnection.HTTP_GATEWAY_TIMEOUT);
     public static final ResponseCode INVALID_VERSION = fromCode(HttpURLConnection.HTTP_VERSION);
 
-    public static ResponseCode fromCode(int httpCode) {
-        return ResponseCode.create(httpCode, getCodeMessage(httpCode));
+    private static final int INFORMATIONAL_BIT = 100;
+    private static final int SUCCESSFUL_CODE_BIT = 200;
+    private static final int REDIRECTION_CODE_BIT = 300;
+    private static final int CLIENT_ERROR_CODE_BIT = 400;
+    private static final int SERVER_ERROR_CODE_BIT = 500;
+
+    public static ResponseCode fromCodeAndMessage(int httpCode, String message) {
+        return new ResponseCode(httpCode, message);
     }
 
-    public static ResponseCode create(int httpCode, String message) {
-        return new ResponseCode(httpCode, message);
+    public static ResponseCode fromCode(int httpCode) {
+        return ResponseCode.fromCodeAndMessage(httpCode, getCodeMessage(httpCode));
+    }
+
+    public static ResponseCode createAndCache(int httpCode, String message) {
+        if (!MESSAGES_BY_CODE.containsKey(httpCode)) {
+            MESSAGES_BY_CODE.put(httpCode, message);
+        }
+        return ResponseCode.fromCodeAndMessage(httpCode, message);
     }
 
     //
@@ -64,16 +78,36 @@ public class ResponseCode {
     private final int code;
     private final String message;
 
-    public ResponseCode add(int add) {
-        return set(code + add);
-    }
-
-    public ResponseCode subtract(int subtract) {
-        return set(code - subtract);
-    }
-
-    public ResponseCode set(int value) {
+    public ResponseCode redirectTo(int value) {
         return new ResponseCode(value, ResponseCode.getCodeMessage(value));
+    }
+
+    public int getBit() {
+        return Math.min(code, SERVER_ERROR_CODE_BIT) / 100 * 100;
+    }
+
+    public boolean isUnknownType() {
+        return code < INFORMATIONAL_BIT || code >= (SERVER_ERROR_CODE_BIT + INFORMATIONAL_BIT);
+    }
+
+    public boolean isInformational() {
+        return Objects.equals(INFORMATIONAL_BIT, getBit());
+    }
+
+    public boolean isSuccessful() {
+        return Objects.equals(SUCCESSFUL_CODE_BIT, getBit());
+    }
+
+    public boolean isRedirection() {
+        return Objects.equals(REDIRECTION_CODE_BIT, getBit());
+    }
+
+    public boolean isClientError() {
+        return Objects.equals(CLIENT_ERROR_CODE_BIT, getBit());
+    }
+
+    public boolean isServerError() {
+        return Objects.equals(SERVER_ERROR_CODE_BIT, getBit());
     }
 
     @Override
@@ -83,10 +117,11 @@ public class ResponseCode {
 
     //
 
-    private static final Map<Integer, String> MESSAGES_BY_CODE = new HashMap<>();
+    private static Map<Integer, String> MESSAGES_BY_CODE;
     private static final String MESSAGE_NOT_FOUND = "Unsupported Response-Code";
 
-    static {
+    private static void initMessagesByCodes() {
+        MESSAGES_BY_CODE = new HashMap<>();
         MESSAGES_BY_CODE.put(HttpURLConnection.HTTP_OK, "OK");
         MESSAGES_BY_CODE.put(HttpURLConnection.HTTP_CREATED, "Created");
         MESSAGES_BY_CODE.put(HttpURLConnection.HTTP_NO_CONTENT, "No Content");
@@ -130,6 +165,9 @@ public class ResponseCode {
     }
 
     private static String getCodeMessage(int responseCode) {
+        if (MESSAGES_BY_CODE == null || MESSAGES_BY_CODE.isEmpty()) {
+            initMessagesByCodes();
+        }
         return MESSAGES_BY_CODE.getOrDefault(responseCode, MESSAGE_NOT_FOUND);
     }
 }
