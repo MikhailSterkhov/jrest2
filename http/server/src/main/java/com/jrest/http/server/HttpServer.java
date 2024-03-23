@@ -8,13 +8,18 @@ import com.jrest.http.server.repository.HttpRepositoryHandler;
 import com.jrest.http.server.repository.HttpServerRepositoryException;
 import com.jrest.http.server.repository.HttpServerRepositoryValidator;
 import com.jrest.http.server.resource.HttpServerResources;
+import com.jrest.mvc.model.HttpRequest;
+import com.jrest.mvc.model.HttpResponse;
 import lombok.Builder;
 import lombok.ToString;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 
 @Builder
@@ -25,6 +30,9 @@ public class HttpServer {
     private final ExecutorService executorService;
 
     private final HttpServerResources resources = HttpServerResources.create();
+
+    private final List<HttpListener> listeners = new ArrayList<>();
+    private final List<HttpListener> asyncListeners = new CopyOnWriteArrayList<>();
 
     public void bind() {
         try {
@@ -40,11 +48,11 @@ public class HttpServer {
     }
 
     public void registerListener(HttpListener listener) {
-        // todo
+        listeners.add(listener);
     }
 
     public void registerAsyncListener(HttpListener listener) {
-        // todo
+        asyncListeners.add(listener);
     }
 
     public void registerRepository(Object repository) {
@@ -61,7 +69,20 @@ public class HttpServer {
     }
 
     private void doRegisterAsListener(HttpRepositoryHandler repositoryHandler) {
-        // todo
+        HttpListener listener = (request) -> {
+
+            if (repositoryHandler.canProcess(request)) {
+                return repositoryHandler.getInvocation().process(request);
+            }
+
+            return HttpResponse.SKIP_ACTION;
+        };
+
+        if (repositoryHandler.isAsynchronous()) {
+            registerAsyncListener(listener);
+        } else {
+            registerListener(listener);
+        }
     }
 
     private void doBind(HttpServerSocket httpServerSocket) {
@@ -81,5 +102,36 @@ public class HttpServer {
         HttpSocketInput httpSocketInput = httpSocket.read();
 
         // todo
+    }
+
+    private Optional<HttpResponse> processHttpRequest(HttpRequest httpRequest) {
+        List<HttpListener> listenersAll = new ArrayList<>();
+        listenersAll.addAll(listeners);
+        listenersAll.addAll(asyncListeners);
+
+        List<HttpResponse> responsesList = new ArrayList<>();
+
+        for (HttpListener listener : listenersAll) {
+            HttpResponse httpResponse = processHttpListener(httpRequest, listener)
+                    .join(); // todo - optimize
+
+            if (httpResponse != HttpResponse.SKIP_ACTION) {
+                responsesList.add(httpResponse);
+            }
+        }
+
+        if (responsesList.size() > 1) {
+            throw new HttpServerException("Http request " + httpRequest.getMethod().getName() + " " + httpRequest.getUri() + " was proceed more then 1 responses");
+        }
+
+        return responsesList.stream().findFirst();
+    }
+
+    private CompletableFuture<HttpResponse> processHttpListener(HttpRequest httpRequest, HttpListener listener) {
+        if (asyncListeners.contains(listener)) {
+            return CompletableFuture.supplyAsync(() -> listener.process(httpRequest),
+                    executorService);
+        }
+        return CompletableFuture.completedFuture(listener.process(httpRequest));
     }
 }

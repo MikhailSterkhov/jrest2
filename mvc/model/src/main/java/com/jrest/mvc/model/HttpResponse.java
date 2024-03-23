@@ -11,6 +11,8 @@ import lombok.ToString;
 @EqualsAndHashCode
 public class HttpResponse {
 
+    public static final HttpResponse SKIP_ACTION = null;
+
     private final ResponseCode code;
 
     private final Headers headers;
