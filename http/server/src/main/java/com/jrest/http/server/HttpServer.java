@@ -7,6 +7,8 @@ import com.jrest.http.api.socket.HttpSocketInput;
 import com.jrest.http.server.repository.HttpRepositoryHandler;
 import com.jrest.http.server.repository.HttpServerRepositoryException;
 import com.jrest.http.server.repository.HttpServerRepositoryValidator;
+import com.jrest.http.server.resource.HttpResourcePath;
+import com.jrest.http.server.resource.HttpResourceUnit;
 import com.jrest.http.server.resource.HttpServerResources;
 import com.jrest.mvc.model.HttpRequest;
 import com.jrest.mvc.model.HttpResponse;
@@ -48,11 +50,16 @@ public class HttpServer {
     }
 
     public void registerListener(HttpListener listener) {
-        listeners.add(listener);
+        // listeners.add(listener);
+        resources.register(
+                HttpResourceUnit.builder()
+                        .path(HttpResourcePath.fromUri("?????????"))
+                        .listener(listener)
+                        .build());
     }
 
     public void registerAsyncListener(HttpListener listener) {
-        asyncListeners.add(listener);
+        // asyncListeners.add(listener);
     }
 
     public void registerRepository(Object repository) {
