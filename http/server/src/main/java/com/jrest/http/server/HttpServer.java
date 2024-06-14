@@ -4,6 +4,7 @@ import com.jrest.http.api.HttpListener;
 import com.jrest.http.api.socket.HttpServerSocket;
 import com.jrest.http.api.socket.HttpSocket;
 import com.jrest.http.api.socket.HttpSocketInput;
+import com.jrest.http.api.socket.HttpSocketOutput;
 import com.jrest.http.server.repository.HttpRepositoryHandler;
 import com.jrest.http.server.repository.HttpServerRepositoryException;
 import com.jrest.http.server.repository.HttpServerRepositoryValidator;
@@ -17,9 +18,11 @@ import lombok.ToString;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
@@ -33,8 +36,9 @@ public class HttpServer {
 
     private final HttpServerResources resources = HttpServerResources.create();
 
-    private final List<HttpListener> listeners = new ArrayList<>();
     private final List<HttpListener> asyncListeners = new CopyOnWriteArrayList<>();
+
+    private Charset readCharset;
 
     public void bind() {
         try {
@@ -49,17 +53,25 @@ public class HttpServer {
         }
     }
 
-    public void registerListener(HttpListener listener) {
-        // listeners.add(listener);
+    public void registerListener(String uri, HttpListener listener) {
         resources.register(
                 HttpResourceUnit.builder()
-                        .path(HttpResourcePath.fromUri("?????????"))
+                        .path(HttpResourcePath.fromUri(uri))
                         .listener(listener)
                         .build());
     }
 
+    public void registerAsyncListener(String uri, HttpListener listener) {
+        registerListener(uri, listener);
+        asyncListeners.add(listener);
+    }
+
+    public void registerListener(HttpListener listener) {
+        registerListener("/", listener);
+    }
+
     public void registerAsyncListener(HttpListener listener) {
-        // asyncListeners.add(listener);
+        registerAsyncListener("/", listener);
     }
 
     public void registerRepository(Object repository) {
@@ -93,6 +105,10 @@ public class HttpServer {
     }
 
     private void doBind(HttpServerSocket httpServerSocket) {
+        if (readCharset == null) {
+            readCharset = Charset.defaultCharset();
+        }
+
         CompletableFuture<HttpSocket> httpSocketCompletableFuture = httpServerSocket.awaitNewCompletion();
         httpSocketCompletableFuture.whenComplete((httpSocket, throwable) -> {
 
@@ -108,19 +124,21 @@ public class HttpServer {
     private void onAccepted(HttpSocket httpSocket) {
         HttpSocketInput httpSocketInput = httpSocket.read();
 
-        // todo
+        HttpRequest httpRequest = httpSocketInput.toHttpRequest(readCharset);
+        Optional<HttpResponse> httpResponseOptional = processHttpRequest(httpRequest);
+
+        httpResponseOptional.ifPresent(httpResponse ->
+                httpSocket.write(new HttpSocketOutput().write(httpResponse)));
     }
 
     private Optional<HttpResponse> processHttpRequest(HttpRequest httpRequest) {
-        List<HttpListener> listenersAll = new ArrayList<>();
-        listenersAll.addAll(listeners);
-        listenersAll.addAll(asyncListeners);
-
+        Set<HttpResourceUnit> allResourcesUnits = resources.getAllResourcesUnits();
         List<HttpResponse> responsesList = new ArrayList<>();
 
-        for (HttpListener listener : listenersAll) {
-            HttpResponse httpResponse = processHttpListener(httpRequest, listener)
-                    .join(); // todo - optimize
+        for (HttpResourceUnit httpResourceUnit : allResourcesUnits) {
+            HttpResponse httpResponse = processHttpListener(httpRequest,
+                    httpResourceUnit.getListener())
+                    .join();
 
             if (httpResponse != HttpResponse.SKIP_ACTION) {
                 responsesList.add(httpResponse);

@@ -1,6 +1,6 @@
 package com.jrest.http.api;
 
-import com.jrest.mvc.model.ContentBody;
+import com.jrest.mvc.model.Content;
 import com.jrest.mvc.model.Headers;
 import com.jrest.mvc.model.HttpResponse;
 import com.jrest.mvc.model.ResponseCode;
@@ -9,12 +9,10 @@ import lombok.Builder;
 import lombok.ToString;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +31,6 @@ public class HttpClientConnection {
 
     public HttpResponse executeRequest() {
         final HttpURLConnection connection = prepareConnection();
-
         initOptions(connection);
 
         if (canWrite()) {
@@ -43,7 +40,7 @@ public class HttpClientConnection {
         String responseBody = readBody(connection);
         try {
             return HttpResponse.builder()
-                    .content(ContentBody.fromText(responseBody))
+                    .content(Content.fromText(responseBody))
                     .code(ResponseCode.fromCode(connection.getResponseCode()))
                     .headers(Headers.fromMap(connection.getHeaderFields()))
                     .build();

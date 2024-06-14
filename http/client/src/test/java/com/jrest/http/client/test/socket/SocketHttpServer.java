@@ -35,7 +35,6 @@ public class SocketHttpServer {
                           "\r\n" +
                           "Hello, World!";
         outputStream.write(response.getBytes());
-
         socket.close();
     }
 

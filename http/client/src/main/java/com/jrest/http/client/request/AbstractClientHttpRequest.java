@@ -33,8 +33,8 @@ public abstract class AbstractClientHttpRequest implements ClientHttpRequest {
     }
 
     @Override
-    public ContentBody body() {
-        return httpRequest.getContentBody();
+    public Content body() {
+        return httpRequest.getContent();
     }
 
     @Override

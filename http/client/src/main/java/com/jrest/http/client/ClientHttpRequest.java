@@ -14,7 +14,7 @@ public interface ClientHttpRequest extends Serializable {
 
     HttpMethod method();
 
-    ContentBody body();
+    Content body();
 
     Optional<HttpResponse> execute();
 

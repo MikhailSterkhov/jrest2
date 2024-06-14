@@ -8,7 +8,7 @@ public class HttpClientTest {
     public static void main(String[] args) {
         HttpClient httpClient = HttpClients.createClient();
 
-        httpClient.executeGet("https://catfact.ninja/fact")
+        httpClient.executeOptions("https://catfact.ninja/fact")
                 .ifPresent(httpResponse -> {
 
                     System.out.println(httpResponse.getHeaders().getFirst(null));

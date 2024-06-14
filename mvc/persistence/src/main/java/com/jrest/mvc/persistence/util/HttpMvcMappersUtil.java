@@ -6,12 +6,8 @@ import lombok.experimental.UtilityClass;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @UtilityClass
@@ -31,7 +27,7 @@ public class HttpMvcMappersUtil {
                     HttpTrace.class
             );
 
-    private static Map<Class<? extends Annotation>, HttpMethod> HTTP_METHODS_BY_MAPPERS;
+    private static Map<Class<? extends Annotation>, Function<Annotation, HttpMethod>> HTTP_METHODS_BY_MAPPERS;
     private static Map<Class<? extends Annotation>, Function<Annotation, String>> URI_GETTERS_BY_MAPPERS;
 
     public boolean isAnnotatedAsRequestMapping(Method method) {
@@ -53,7 +49,11 @@ public class HttpMvcMappersUtil {
             throw new HttpMvcException("Method `" + method + "` uses more than one request-mapper annotation");
         }
 
-        return HTTP_METHODS_BY_MAPPERS.getOrDefault(annotationTypesList.get(0), HttpMethod.UNKNOWN);
+        Class<? extends Annotation> annotationType = annotationTypesList.get(0);
+
+        return Optional.ofNullable(HTTP_METHODS_BY_MAPPERS.get(annotationType))
+                .map(func -> func.apply(method.getDeclaredAnnotation(annotationType)))
+                .orElse(HttpMethod.UNKNOWN);
     }
 
     public String findUri(Method method) {
@@ -79,18 +79,19 @@ public class HttpMvcMappersUtil {
     private void initMapsLazy() {
         if (HTTP_METHODS_BY_MAPPERS == null || HTTP_METHODS_BY_MAPPERS.isEmpty()) {
             HTTP_METHODS_BY_MAPPERS = new HashMap<>();
-            HTTP_METHODS_BY_MAPPERS.put(HttpGet.class, HttpMethod.GET);
-            HTTP_METHODS_BY_MAPPERS.put(HttpDelete.class, HttpMethod.DELETE);
-            HTTP_METHODS_BY_MAPPERS.put(HttpPost.class, HttpMethod.POST);
-            HTTP_METHODS_BY_MAPPERS.put(HttpPut.class, HttpMethod.PUT);
-            HTTP_METHODS_BY_MAPPERS.put(HttpConnect.class, HttpMethod.CONNECT);
-            HTTP_METHODS_BY_MAPPERS.put(HttpPatch.class, HttpMethod.PATCH);
-            HTTP_METHODS_BY_MAPPERS.put(HttpTrace.class,  HttpMethod.TRACE);
+            registerMethodGetter(HttpRequestMapping.class, (a) -> HttpMethod.fromName(a.method()));
+            registerMethodGetter(HttpGet.class, (a) -> HttpMethod.GET);
+            registerMethodGetter(HttpDelete.class, (a) -> HttpMethod.DELETE);
+            registerMethodGetter(HttpPost.class, (a) -> HttpMethod.POST);
+            registerMethodGetter(HttpPut.class, (a) -> HttpMethod.PUT);
+            registerMethodGetter(HttpConnect.class, (a) -> HttpMethod.CONNECT);
+            registerMethodGetter(HttpPatch.class, (a) -> HttpMethod.PATCH);
+            registerMethodGetter(HttpTrace.class,  (a) -> HttpMethod.TRACE);
         }
 
         if (URI_GETTERS_BY_MAPPERS == null || URI_GETTERS_BY_MAPPERS.isEmpty()) {
             URI_GETTERS_BY_MAPPERS = new HashMap<>();
-            registerUriGetter(HttpRequestMapping.class, HttpRequestMapping::value);
+            registerUriGetter(HttpRequestMapping.class, HttpRequestMapping::path);
             registerUriGetter(HttpGet.class, HttpGet::value);
             registerUriGetter(HttpDelete.class, HttpDelete::value);
             registerUriGetter(HttpPost.class, HttpPost::value);
@@ -99,6 +100,11 @@ public class HttpMvcMappersUtil {
             registerUriGetter(HttpPatch.class, HttpPatch::value);
             registerUriGetter(HttpTrace.class, HttpTrace::value);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T extends Annotation> void registerMethodGetter(Class<T> cls, Function<T, HttpMethod> function) {
+        HTTP_METHODS_BY_MAPPERS.put(cls, (Function<Annotation, HttpMethod>) function);
     }
 
     @SuppressWarnings("unchecked")

@@ -26,13 +26,13 @@ public class HttpBrowserServerTest {
     @HttpAsync
     @HttpPost("/user")
     public HttpResponse doUserPost(HttpRequest request) {
-        UserEntity entity = request.getContentBody().toEntity(UserEntity.class);
+        UserEntity entity = request.getContent().toEntity(UserEntity.class);
 
         System.out.println(entity);
 
         return HttpResponse.builder()
                 .code(ResponseCode.CREATED)
-                .content(ContentBody.fromText("{\"status\": \"Success created\", \"user_id\": 1}"))
+                .content(Content.fromText("{\"status\": \"Success created\", \"user_id\": 1}"))
                 .build();
     }
 }

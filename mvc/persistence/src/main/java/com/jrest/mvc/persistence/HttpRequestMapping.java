@@ -9,5 +9,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface HttpRequestMapping {
 
-    String value() default "/";
+    String method() default "*";
+
+    String path() default "/";
 }

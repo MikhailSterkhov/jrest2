@@ -3,7 +3,7 @@ package com.jrest.mvc.persistence.listener.defaults;
 import com.jrest.mvc.model.HttpRequest;
 import com.jrest.mvc.model.HttpResponse;
 import com.jrest.mvc.model.ResponseCode;
-import com.jrest.mvc.model.ContentBody;
+import com.jrest.mvc.model.Content;
 import com.jrest.mvc.persistence.listener.HttpExceptionListener;
 
 public class HttpInternalErrorExceptionListener implements HttpExceptionListener {
@@ -12,7 +12,7 @@ public class HttpInternalErrorExceptionListener implements HttpExceptionListener
     public HttpResponse handle(HttpRequest request, Throwable exception) {
         return HttpResponse.builder()
                 .code(ResponseCode.INTERNAL_ERROR)
-                .content(ContentBody.fromText(exception.toString()))
+                .content(Content.fromText(exception.toString()))
                 .build();
     }
 }

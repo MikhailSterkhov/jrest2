@@ -1,7 +1,7 @@
 package com.jrest.http.client.request;
 
 import com.jrest.http.api.HttpClientConnection;
-import com.jrest.mvc.model.ContentBody;
+import com.jrest.mvc.model.Content;
 import com.jrest.mvc.model.Headers;
 import com.jrest.mvc.model.HttpRequest;
 import com.jrest.mvc.model.HttpResponse;
@@ -36,8 +36,8 @@ public class URLClientRequest extends AbstractClientHttpRequest {
                 Optional.ofNullable(httpRequest.getUrl()).orElse("") +
                         Optional.ofNullable(httpRequest.getUri()).orElse("");
 
-        String outputString = Optional.ofNullable(httpRequest.getContentBody())
-                .map(ContentBody::getHyperText)
+        String outputString = Optional.ofNullable(httpRequest.getContent())
+                .map(Content::getHyperText)
                 .orElse(null);
 
         Map<String, List<String>> headersMap = Optional.ofNullable(httpRequest.getHeaders())
