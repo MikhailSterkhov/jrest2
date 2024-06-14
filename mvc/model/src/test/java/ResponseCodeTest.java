@@ -14,6 +14,5 @@ public class ResponseCodeTest {
         System.out.println("422 " + ResponseCode.getCodeMessage(ResponseCode.UNPROCESSABLE_ENTITY));
         System.out.println("200 " + ResponseCode.getCodeMessage(ResponseCode.OK));
         System.out.println("301 " + ResponseCode.getCodeMessage(ResponseCode.MOVED_PERMANENTLY));
-        System.out.println("400 " + ResponseCode.OK.redirectTo(400).getMessage());
     }
 }
