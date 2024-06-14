@@ -4,5 +4,5 @@ public enum HttpAuthorizationResult {
 
     SUCCESS,
     FAILURE,
-    NO_SERVICE_CONNECTION,
+    NO_CONNECTION,
 }

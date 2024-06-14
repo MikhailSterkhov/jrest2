@@ -1,4 +1,4 @@
-package com.jrest.mvc.model;
+import com.jrest.mvc.model.ResponseCode;
 
 public class ResponseCodeTest {
 

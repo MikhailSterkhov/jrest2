@@ -2,6 +2,10 @@ package com.jrest.mvc.model;
 
 import lombok.*;
 
+/**
+ * Класс ContentType предоставляет константы для различных типов содержимого MIME.
+ * Также позволяет создавать новые типы содержимого из строки.
+ */
 @Getter
 @ToString
 @EqualsAndHashCode
@@ -32,6 +36,12 @@ public class ContentType {
     public static final ContentType DEFAULT_TEXT = TEXT_PLAIN;
     public static final ContentType DEFAULT_BINARY = APPLICATION_OCTET_STREAM;
 
+    /**
+     * Создает новый объект ContentType из переданной строки MIME-типа.
+     *
+     * @param value строка MIME-типа.
+     * @return новый объект ContentType.
+     */
     public static ContentType fromString(String value) {
         return new ContentType(value);
     }

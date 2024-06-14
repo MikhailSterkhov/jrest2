@@ -1,6 +1,6 @@
 package com.jrest.mvc.model;
 
-import com.jrest.mvc.model.util.BodyBytesUtil;
+import com.jrest.mvc.model.util.ContentUtil;
 import com.jrest.mvc.model.util.InputStreamUtil;
 import lombok.*;
 
@@ -27,7 +27,7 @@ public class WebResource {
     }
 
     public static WebResource fromText(String text) {
-        return fromStream(new ByteArrayInputStream(BodyBytesUtil.fromString(text)));
+        return fromStream(new ByteArrayInputStream(ContentUtil.fromString(text)));
     }
 
     private final byte[] bytesArray;

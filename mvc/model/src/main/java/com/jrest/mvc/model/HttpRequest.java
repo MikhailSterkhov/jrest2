@@ -12,7 +12,7 @@ import lombok.ToString;
 public class HttpRequest {
 
     private final String url, uri;
-    private final ContentBody contentBody;
+    private final Content content;
     private final Headers headers;
     private final Attributes attributes;
     private final HttpMethod method;

@@ -16,5 +16,5 @@ public class HttpResponse {
     private final ResponseCode code;
 
     private final Headers headers;
-    private final ContentBody content;
+    private final Content content;
 }
