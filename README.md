@@ -2,7 +2,8 @@
 
 # JREST
 
-[ `Java` `REST` `Version 2.0.0` `Framework` ]
+<img src="https://img.shields.io/badge/lang-Java-red?style=flat" />
+<img src="https://img.shields.io/badge/version-1.0-gree?style=flat" />
 
 A framework written and wrapped under the Java programming 
 language that provides the necessary data model for REST-specific 
@@ -25,7 +26,7 @@ Dependency block for Maven structure project:
 <dependency>
     <groupId>com.jrest.framework</groupId>
     <artifactId>jrest2</artifactId>
-    <version>2.0.0</version>
+    <version>1.0</version>
 </dependency>
 ```
 
@@ -376,7 +377,7 @@ public HttpResponse patchEmployee(HttpRequest request) {
 
 <div align="center">
 
-> **Development by <a href="https://github.com/xxcoldinme">@xxcoldinme</a>**
+> **Development by <a href="https://github.com/MikhailSterkhov">@MikhailSterkhov</a>**
 > <br>We can support me here:
 > <br><br><a href="https://www.buymeacoffee.com/itzstonlex" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 

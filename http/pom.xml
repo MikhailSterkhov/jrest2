@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.jrest.framework</groupId>
         <artifactId>jrest2</artifactId>
-        <version>2.0.0</version>
+        <version>1.0</version>
     </parent>
 
     <artifactId>http</artifactId>
@@ -28,12 +28,12 @@
         <dependency>
             <groupId>com.jrest.framework</groupId>
             <artifactId>model</artifactId>
-            <version>2.0.0</version>
+            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>com.jrest.framework</groupId>
             <artifactId>persistence</artifactId>
-            <version>2.0.0</version>
+            <version>1.0</version>
         </dependency>
     </dependencies>
 </project>
