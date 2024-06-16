@@ -44,7 +44,7 @@ public class HttpServerSocketChannel {
 
     private void startHttpServer() throws IOException {
         serverSocketChannel = ServerSocketChannel.open();
-        serverSocketChannel.socket().bind(new InetSocketAddress(config.getPort()));
+        serverSocketChannel.socket().bind(config.getAddress());
         serverSocketChannel.configureBlocking(false);
 
         executorService.submit(() -> {
@@ -61,7 +61,7 @@ public class HttpServerSocketChannel {
     private void startHttpsServer() throws IOException {
         SSLContext sslContext = createSSLContext();
         SSLServerSocketFactory sslServerSocketFactory = sslContext.getServerSocketFactory();
-        SSLServerSocket sslServerSocket = (SSLServerSocket) sslServerSocketFactory.createServerSocket(config.getPort());
+        SSLServerSocket sslServerSocket = (SSLServerSocket) sslServerSocketFactory.createServerSocket(config.getAddress().getPort());
 
         executorService.submit(() -> {
             while (true) {

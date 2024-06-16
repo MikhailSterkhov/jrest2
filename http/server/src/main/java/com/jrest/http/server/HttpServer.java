@@ -71,7 +71,7 @@ public class HttpServer {
             HttpServerSocketConfig config =
                     HttpServerSocketConfig.builder()
                             .protocol(HttpProtocol.HTTP_1_1)
-                            .port(socketAddress.getPort())
+                            .address(socketAddress)
                             .ssl(sslContent != null)
                             .keepAlive(true)
                             .keystorePath(sslContent != null ? sslContent.getKeystorePath() : null)
