@@ -1,5 +1,6 @@
 package com.jrest.http.client;
 
+import com.jrest.mvc.model.HttpProtocol;
 import lombok.experimental.UtilityClass;
 
 import java.util.concurrent.ExecutorService;
@@ -18,6 +19,7 @@ public class HttpClients {
      */
     public HttpClient createSocketClient(ExecutorService executorService) {
         return SocketHttpClient.builder()
+                .protocol(HttpProtocol.HTTP_1_1)
                 .executorService(executorService)
                 .build();
     }
@@ -31,6 +33,7 @@ public class HttpClients {
      */
     public HttpClient createSocketClient(ExecutorService executorService, boolean keepAlive) {
         return SocketHttpClient.builder()
+                .protocol(HttpProtocol.HTTP_1_1)
                 .executorService(executorService)
                 .keepAlive(keepAlive)
                 .build();
@@ -45,6 +48,7 @@ public class HttpClients {
      */
     public HttpClient createSocketClient(ExecutorService executorService, int connectTimeout) {
         return SocketHttpClient.builder()
+                .protocol(HttpProtocol.HTTP_1_1)
                 .executorService(executorService)
                 .connectTimeout(connectTimeout)
                 .build();
@@ -60,6 +64,7 @@ public class HttpClients {
      */
     public HttpClient createSocketClient(ExecutorService executorService, int connectTimeout, boolean keepAlive) {
         return SocketHttpClient.builder()
+                .protocol(HttpProtocol.HTTP_1_1)
                 .executorService(executorService)
                 .connectTimeout(connectTimeout)
                 .keepAlive(keepAlive)
@@ -83,6 +88,7 @@ public class HttpClients {
      */
     public HttpClient createSocketClient(boolean keepAlive) {
         return SocketHttpClient.builder()
+                .protocol(HttpProtocol.HTTP_1_1)
                 .keepAlive(keepAlive)
                 .build();
     }
@@ -95,6 +101,7 @@ public class HttpClients {
      */
     public HttpClient createSocketClient(int connectTimeout) {
         return SocketHttpClient.builder()
+                .protocol(HttpProtocol.HTTP_1_1)
                 .connectTimeout(connectTimeout)
                 .build();
     }
@@ -108,6 +115,7 @@ public class HttpClients {
      */
     public HttpClient createSocketClient(int connectTimeout, boolean keepAlive) {
         return SocketHttpClient.builder()
+                .protocol(HttpProtocol.HTTP_1_1)
                 .connectTimeout(connectTimeout)
                 .keepAlive(keepAlive)
                 .build();

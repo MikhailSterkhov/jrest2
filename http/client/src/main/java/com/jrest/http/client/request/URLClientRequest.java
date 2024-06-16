@@ -1,10 +1,7 @@
 package com.jrest.http.client.request;
 
 import com.jrest.http.api.HttpClientConnection;
-import com.jrest.mvc.model.Content;
-import com.jrest.mvc.model.Headers;
-import com.jrest.mvc.model.HttpRequest;
-import com.jrest.mvc.model.HttpResponse;
+import com.jrest.mvc.model.*;
 import lombok.Builder;
 
 import java.nio.charset.StandardCharsets;
@@ -20,7 +17,7 @@ public class URLClientRequest extends AbstractClientHttpRequest {
 
     @Builder
     protected URLClientRequest(HttpRequest httpRequest, ExecutorService executorService) {
-        super(httpRequest, executorService);
+        super(HttpProtocol.HTTP_1_1, httpRequest, executorService);
     }
 
     @Override

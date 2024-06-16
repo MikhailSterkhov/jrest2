@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutorService;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractClientHttpRequest implements ClientHttpRequest {
 
+    private final HttpProtocol protocol;
     private final HttpRequest httpRequest;
     private final ExecutorService executorService;
 

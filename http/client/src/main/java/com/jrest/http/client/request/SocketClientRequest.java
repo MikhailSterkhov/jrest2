@@ -15,8 +15,8 @@ public class SocketClientRequest extends AbstractClientHttpRequest {
     private final Boolean keepAlive;
 
     @Builder
-    protected SocketClientRequest(HttpRequest httpRequest, ExecutorService executorService, Integer timeout, Boolean keepAlive) {
-        super(httpRequest, executorService);
+    protected SocketClientRequest(HttpProtocol protocol, HttpRequest httpRequest, ExecutorService executorService, Integer timeout, Boolean keepAlive) {
+        super(protocol, httpRequest, executorService);
         this.timeout = timeout;
         this.keepAlive = keepAlive;
     }
@@ -24,8 +24,10 @@ public class SocketClientRequest extends AbstractClientHttpRequest {
     @Override
     public Optional<HttpResponse> execute() {
         HttpRequest httpRequest = getHttpRequest();
+        HttpProtocol httpProtocol = getProtocol();
 
-        HttpClientSocketChannel socketChannel = HttpClientSocketChannel.fromUrl(HttpProtocol.HTTP_1_1,
+        HttpClientSocketChannel socketChannel = HttpClientSocketChannel.fromUrl(
+                httpProtocol,
                 httpRequest.getUrl(),
                 Optional.ofNullable(keepAlive).orElse(true),
                 Optional.ofNullable(timeout).orElse(5000));
