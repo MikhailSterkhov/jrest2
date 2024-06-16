@@ -35,7 +35,7 @@ Dependency block for Maven structure project:
 Dependency block for Gradle structure project:
 
 ```groovy
-compileOnly 'com.jrest.framework:jrest2:2.0.0'
+compileOnly 'com.jrest.framework:jrest2:1.0'
 ```
 
 ---
