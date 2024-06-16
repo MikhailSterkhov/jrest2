@@ -23,6 +23,13 @@ communication between channels.
 Dependency block for Maven structure project:
 
 ```xml
+<repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+</repository>
+```
+
+```xml
 <dependency>
     <groupId>com.jrest.framework</groupId>
     <artifactId>jrest2</artifactId>
@@ -33,6 +40,13 @@ Dependency block for Maven structure project:
 #### Gradle
 
 Dependency block for Gradle structure project:
+
+```groovy
+repositories {
+	mavenCentral()
+	maven { url 'https://jitpack.io' }
+}
+```
 
 ```groovy
 compileOnly 'com.jrest.framework:jrest2:1.0'
