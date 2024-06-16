@@ -31,7 +31,7 @@ Dependency block for Maven structure project:
 
 ```xml
 <dependency>
-    <groupId>com.jrest.framework</groupId>
+    <groupId>com.github.MikhailSterkhov</groupId>
     <artifactId>jrest2</artifactId>
     <version>1.0</version>
 </dependency>
@@ -49,7 +49,7 @@ repositories {
 ```
 
 ```groovy
-compileOnly 'com.jrest.framework:jrest2:1.0'
+compileOnly 'com.github.MikhailSterkhov:jrest2:1.0'
 ```
 
 ---
