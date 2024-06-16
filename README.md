@@ -198,7 +198,7 @@ httpServer.registerListener(httpRequest -> {
 httpServer.registerAsyncListener("/employee", httpRequest -> 
         HttpResponse.ok(Content.fromEntity(
                 Employee.builder()
-                        .id(attributeIdOptional.get())
+                        .id(567))
                         .jobInfo(EmployeeJob.builder()
                                 .company("Microsoft Corporation")
                                 .website("https://www.microsoft.com/")
