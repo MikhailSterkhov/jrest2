@@ -14,7 +14,6 @@ import java.util.Set;
  * идемпотентность, необходимость тела запроса, кэшируемость и требование ответа.
  */
 @Getter
-@ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class HttpMethod {
@@ -92,5 +91,10 @@ public class HttpMethod {
      */
     public boolean needsResponse() {
         return !Objects.equals(this, HEAD);
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

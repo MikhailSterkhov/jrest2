@@ -1,15 +1,11 @@
 package com.jrest.http.api;
 
-import com.jrest.mvc.model.Content;
-import com.jrest.mvc.model.Headers;
-import com.jrest.mvc.model.HttpResponse;
-import com.jrest.mvc.model.ResponseCode;
+import com.jrest.mvc.model.*;
 import com.jrest.mvc.model.util.InputStreamUtil;
 import lombok.Builder;
 import lombok.ToString;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
@@ -37,11 +33,14 @@ public class HttpClientConnection {
             writeBody(connection);
         }
 
-        String responseBody = readBody(connection);
+
         try {
+            ResponseCode responseCode = ResponseCode.fromCode(connection.getResponseCode());
+            String responseBody = !responseCode.isError() ? readBody(connection) : "";
             return HttpResponse.builder()
+                    .protocol(HttpProtocol.HTTP_1_1)
+                    .code(responseCode)
                     .content(Content.fromText(responseBody))
-                    .code(ResponseCode.fromCode(connection.getResponseCode()))
                     .headers(Headers.fromMap(connection.getHeaderFields()))
                     .build();
         } catch (IOException exception) {
@@ -78,7 +77,7 @@ public class HttpClientConnection {
         try {
             return InputStreamUtil.toString(connection.getInputStream());
         } catch (IOException exception) {
-            throw new HttpURLException(exception);
+            return "";
         }
     }
 

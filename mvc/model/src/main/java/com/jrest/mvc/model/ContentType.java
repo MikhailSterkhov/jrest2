@@ -7,7 +7,6 @@ import lombok.*;
  * Также позволяет создавать новые типы содержимого из строки.
  */
 @Getter
-@ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ContentType {
@@ -47,4 +46,9 @@ public class ContentType {
     }
 
     private final String mime;
+
+    @Override
+    public String toString() {
+        return mime;
+    }
 }

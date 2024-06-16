@@ -1,34 +1,30 @@
 package com.jrest.http.server;
 
 import com.jrest.http.api.HttpListener;
-import com.jrest.http.api.socket.HttpServerSocket;
-import com.jrest.http.api.socket.HttpSocket;
-import com.jrest.http.api.socket.HttpSocketInput;
-import com.jrest.http.api.socket.HttpSocketOutput;
+import com.jrest.http.api.socket.HttpServerSocketChannel;
+import com.jrest.http.api.socket.HttpServerSocketConfig;
 import com.jrest.http.server.repository.HttpRepositoryHandler;
 import com.jrest.http.server.repository.HttpServerRepositoryException;
 import com.jrest.http.server.repository.HttpServerRepositoryValidator;
 import com.jrest.http.server.resource.HttpResourcePath;
 import com.jrest.http.server.resource.HttpResourceUnit;
 import com.jrest.http.server.resource.HttpServerResources;
+import com.jrest.mvc.model.HttpProtocol;
 import com.jrest.mvc.model.HttpRequest;
 import com.jrest.mvc.model.HttpResponse;
+import com.jrest.mvc.model.ResponseCode;
 import lombok.Builder;
-import lombok.ToString;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-@Builder
-@ToString
 public class HttpServer {
 
     private final InetSocketAddress socketAddress;
@@ -38,19 +34,60 @@ public class HttpServer {
 
     private final List<HttpListener> asyncListeners = new CopyOnWriteArrayList<>();
 
-    private Charset readCharset;
+    private final HttpProtocol protocol;
+    private HttpServerSocketChannel httpServerSocketChannel;
+
+    private final SslContent sslContent;
+
+    @Builder
+    public HttpServer(InetSocketAddress socketAddress, ExecutorService executorService, HttpProtocol protocol, SslContent ssl) {
+        this.socketAddress = socketAddress;
+        this.sslContent = ssl;
+        this.executorService = Optional.ofNullable(executorService).orElseGet(Executors::newCachedThreadPool);
+        this.protocol = Optional.ofNullable(protocol).orElse(HttpProtocol.HTTP_1_1);
+    }
 
     public void bind() {
         try {
-            HttpServerSocket httpServerSocket = HttpServerSocket.builder()
-                    .address(socketAddress)
-                    .executorService(executorService)
-                    .build();
+            HttpServerSocketConfig config =
+                    HttpServerSocketConfig.builder()
+                            .protocol(HttpProtocol.HTTP_1_1)
+                            .port(socketAddress.getPort())
+                            .ssl(sslContent != null)
+                            .keepAlive(true)
+                            .keystorePath(sslContent != null ? sslContent.getKeystorePath() : null)
+                            .keyPassword(sslContent != null ? sslContent.getKeyPassword() : null)
+                            .keystorePassword(sslContent != null ? sslContent.getKeystorePassword() : null)
+                            .build();
 
-            doBind(httpServerSocket);
+            httpServerSocketChannel = new HttpServerSocketChannel(config, executorService,
+                    (clientChannel, request) -> {
+                        Optional<HttpResponse> httpResponseOptional = processHttpRequest(request)
+                                .map(httpResponse -> httpResponse.toBuilder().protocol(protocol).build());
+
+                        try {
+                            if (httpResponseOptional.isPresent()) {
+                                clientChannel.sendResponse(
+                                        httpResponseOptional.get());
+                            } else {
+                                clientChannel.sendResponse(HttpResponse.builder()
+                                        .protocol(protocol)
+                                        .code(ResponseCode.NOT_FOUND)
+                                        .build());
+                            }
+                        } catch (IOException exception) {
+                            throw new HttpServerException(exception);
+                        }
+                    });
+
+            httpServerSocketChannel.start();
         } catch (IOException exception) {
             throw new HttpServerException("bind", exception);
         }
+    }
+
+    public void shutdown() {
+        httpServerSocketChannel.shutdown();
     }
 
     public void registerListener(String uri, HttpListener listener) {
@@ -67,11 +104,11 @@ public class HttpServer {
     }
 
     public void registerListener(HttpListener listener) {
-        registerListener("/", listener);
+        registerListener("*", listener);
     }
 
     public void registerAsyncListener(HttpListener listener) {
-        registerAsyncListener("/", listener);
+        registerAsyncListener("*", listener);
     }
 
     public void registerRepository(Object repository) {
@@ -94,59 +131,36 @@ public class HttpServer {
                 return repositoryHandler.getInvocation().process(request);
             }
 
-            return HttpResponse.SKIP_ACTION;
+            return HttpListener.SKIP_ACTION;
         };
 
+        String uri = repositoryHandler.getUri();
         if (repositoryHandler.isAsynchronous()) {
-            registerAsyncListener(listener);
+            registerAsyncListener(uri, listener);
         } else {
-            registerListener(listener);
+            registerListener(uri, listener);
         }
-    }
-
-    private void doBind(HttpServerSocket httpServerSocket) {
-        if (readCharset == null) {
-            readCharset = Charset.defaultCharset();
-        }
-
-        CompletableFuture<HttpSocket> httpSocketCompletableFuture = httpServerSocket.awaitNewCompletion();
-        httpSocketCompletableFuture.whenComplete((httpSocket, throwable) -> {
-
-            if (throwable != null) {
-                throw new HttpServerException("http-request acceptation", throwable);
-            }
-
-            onAccepted(httpSocket);
-            doBind(httpServerSocket);
-        });
-    }
-
-    private void onAccepted(HttpSocket httpSocket) {
-        HttpSocketInput httpSocketInput = httpSocket.read();
-
-        HttpRequest httpRequest = httpSocketInput.toHttpRequest(readCharset);
-        Optional<HttpResponse> httpResponseOptional = processHttpRequest(httpRequest);
-
-        httpResponseOptional.ifPresent(httpResponse ->
-                httpSocket.write(new HttpSocketOutput().write(httpResponse)));
     }
 
     private Optional<HttpResponse> processHttpRequest(HttpRequest httpRequest) {
-        Set<HttpResourceUnit> allResourcesUnits = resources.getAllResourcesUnits();
+        List<HttpResourceUnit> allResourcesUnits = resources.getAllResourcesUnits();
         List<HttpResponse> responsesList = new ArrayList<>();
 
         for (HttpResourceUnit httpResourceUnit : allResourcesUnits) {
-            HttpResponse httpResponse = processHttpListener(httpRequest,
-                    httpResourceUnit.getListener())
-                    .join();
+            if (!httpResourceUnit.isExpected("*") && !httpResourceUnit.isExpected(httpRequest.getUrl())) {
+                continue;
+            }
 
-            if (httpResponse != HttpResponse.SKIP_ACTION) {
+            HttpResponse httpResponse = processHttpListener(httpRequest,
+                    httpResourceUnit.getListener()).join();
+
+            if (httpResponse != HttpListener.SKIP_ACTION) {
                 responsesList.add(httpResponse);
             }
         }
 
         if (responsesList.size() > 1) {
-            throw new HttpServerException("Http request " + httpRequest.getMethod().getName() + " " + httpRequest.getUri() + " was proceed more then 1 responses");
+            throw new HttpServerException("Http request " + httpRequest.getMethod().getName() + " " + httpRequest.getPath() + " was proceed more then 1 responses");
         }
 
         return responsesList.stream().findFirst();
@@ -154,9 +168,9 @@ public class HttpServer {
 
     private CompletableFuture<HttpResponse> processHttpListener(HttpRequest httpRequest, HttpListener listener) {
         if (asyncListeners.contains(listener)) {
-            return CompletableFuture.supplyAsync(() -> listener.process(httpRequest),
-                    executorService);
+            return CompletableFuture.supplyAsync(() -> listener.process(httpRequest));
         }
-        return CompletableFuture.completedFuture(listener.process(httpRequest));
+        HttpResponse process = listener.process(httpRequest);
+        return CompletableFuture.completedFuture(process);
     }
 }

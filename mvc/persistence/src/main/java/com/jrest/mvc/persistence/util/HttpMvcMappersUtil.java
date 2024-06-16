@@ -35,6 +35,21 @@ public class HttpMvcMappersUtil {
         return MAPPERS_ANNOTATIONS.stream().anyMatch(method::isAnnotationPresent);
     }
 
+    public boolean isAnnotatedAsBeforeExecution(Method method) {
+        initMapsLazy();
+        return method.isAnnotationPresent(HttpBeforeExecution.class);
+    }
+
+    public boolean isAnnotatedAsAsync(Method method) {
+        initMapsLazy();
+        return method.isAnnotationPresent(HttpAsync.class);
+    }
+
+    public boolean isAnnotatedAsHttpServer(Class<?> cls) {
+        initMapsLazy();
+        return cls.isAnnotationPresent(HttpServer.class);
+    }
+
     public HttpMethod toHttpMethod(Method method) {
         initMapsLazy();
 

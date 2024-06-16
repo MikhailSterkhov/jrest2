@@ -32,19 +32,15 @@ public class URLClientRequest extends AbstractClientHttpRequest {
     }
 
     private HttpClientConnection prepare(HttpRequest httpRequest) {
-        String fullUrl =
-                Optional.ofNullable(httpRequest.getUrl()).orElse("") +
-                        Optional.ofNullable(httpRequest.getUri()).orElse("");
-
         String outputString = Optional.ofNullable(httpRequest.getContent())
                 .map(Content::getHyperText)
                 .orElse(null);
 
         Map<String, List<String>> headersMap = Optional.ofNullable(httpRequest.getHeaders())
-                .map(Headers::getHeaders).orElse(null);
+                .map(Headers::getMap).orElse(null);
 
         return HttpClientConnection.builder()
-                .url(fullUrl)
+                .url(httpRequest.getUrl())
                 .output(outputString)
                 .headers(headersMap)
                 .charset(StandardCharsets.UTF_8)

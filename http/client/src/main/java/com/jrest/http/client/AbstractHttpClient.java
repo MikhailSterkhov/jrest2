@@ -36,6 +36,15 @@ public abstract class AbstractHttpClient implements HttpClient {
     }
 
     @Override
+    public Optional<HttpResponse> executeGet(String url, Attributes attributes) {
+        return execute(HttpRequest.builder()
+                .attributes(attributes)
+                .method(HttpMethod.GET)
+                .url(url)
+                .build());
+    }
+
+    @Override
     public Optional<HttpResponse> executeGet(String url, Content content) {
         return execute(HttpRequest.builder()
                 .method(HttpMethod.GET)
@@ -105,6 +114,15 @@ public abstract class AbstractHttpClient implements HttpClient {
     }
 
     @Override
+    public Optional<HttpResponse> executeDelete(String url, Attributes attributes) {
+        return execute(HttpRequest.builder()
+                .attributes(attributes)
+                .method(HttpMethod.DELETE)
+                .url(url)
+                .build());
+    }
+
+    @Override
     public Optional<HttpResponse> executeDelete(String url, Content content) {
         return execute(HttpRequest.builder()
                 .method(HttpMethod.DELETE)
@@ -168,6 +186,15 @@ public abstract class AbstractHttpClient implements HttpClient {
     @Override
     public Optional<HttpResponse> executePost(String url) {
         return execute(HttpRequest.builder()
+                .method(HttpMethod.POST)
+                .url(url)
+                .build());
+    }
+
+    @Override
+    public Optional<HttpResponse> executePost(String url, Attributes attributes) {
+        return execute(HttpRequest.builder()
+                .attributes(attributes)
                 .method(HttpMethod.POST)
                 .url(url)
                 .build());
@@ -244,6 +271,15 @@ public abstract class AbstractHttpClient implements HttpClient {
     }
 
     @Override
+    public Optional<HttpResponse> executePut(String url, Attributes attributes) {
+        return execute(HttpRequest.builder()
+                .attributes(attributes)
+                .method(HttpMethod.PUT)
+                .url(url)
+                .build());
+    }
+
+    @Override
     public Optional<HttpResponse> executePut(String url, Content content) {
         return execute(HttpRequest.builder()
                 .method(HttpMethod.PUT)
@@ -307,6 +343,15 @@ public abstract class AbstractHttpClient implements HttpClient {
     @Override
     public Optional<HttpResponse> executeTrace(String url) {
         return execute(HttpRequest.builder()
+                .method(HttpMethod.TRACE)
+                .url(url)
+                .build());
+    }
+
+    @Override
+    public Optional<HttpResponse> executeTrace(String url, Attributes attributes) {
+        return execute(HttpRequest.builder()
+                .attributes(attributes)
                 .method(HttpMethod.TRACE)
                 .url(url)
                 .build());
@@ -382,6 +427,15 @@ public abstract class AbstractHttpClient implements HttpClient {
     }
 
     @Override
+    public Optional<HttpResponse> executeHead(String url, Attributes attributes) {
+        return execute(HttpRequest.builder()
+                .attributes(attributes)
+                .method(HttpMethod.HEAD)
+                .url(url)
+                .build());
+    }
+
+    @Override
     public Optional<HttpResponse> executeHead(String url, Content content) {
         return execute(HttpRequest.builder()
                 .method(HttpMethod.HEAD)
@@ -445,6 +499,15 @@ public abstract class AbstractHttpClient implements HttpClient {
     @Override
     public Optional<HttpResponse> executeOptions(String url) {
         return execute(HttpRequest.builder()
+                .method(HttpMethod.OPTIONS)
+                .url(url)
+                .build());
+    }
+
+    @Override
+    public Optional<HttpResponse> executeOptions(String url, Attributes attributes) {
+        return execute(HttpRequest.builder()
+                .attributes(attributes)
                 .method(HttpMethod.OPTIONS)
                 .url(url)
                 .build());
@@ -520,6 +583,15 @@ public abstract class AbstractHttpClient implements HttpClient {
     }
 
     @Override
+    public Optional<HttpResponse> executeConnect(String url, Attributes attributes) {
+        return execute(HttpRequest.builder()
+                .attributes(attributes)
+                .method(HttpMethod.CONNECT)
+                .url(url)
+                .build());
+    }
+
+    @Override
     public Optional<HttpResponse> executeConnect(String url, Content content) {
         return execute(HttpRequest.builder()
                 .method(HttpMethod.CONNECT)
@@ -583,6 +655,15 @@ public abstract class AbstractHttpClient implements HttpClient {
     @Override
     public Optional<HttpResponse> executePatch(String url) {
         return execute(HttpRequest.builder()
+                .method(HttpMethod.PATCH)
+                .url(url)
+                .build());
+    }
+
+    @Override
+    public Optional<HttpResponse> executePatch(String url, Attributes attributes) {
+        return execute(HttpRequest.builder()
+                .attributes(attributes)
                 .method(HttpMethod.PATCH)
                 .url(url)
                 .build());
@@ -658,6 +739,15 @@ public abstract class AbstractHttpClient implements HttpClient {
     }
 
     @Override
+    public CompletableFuture<HttpResponse> executeAsyncGet(String url, Attributes attributes) {
+        return executeAsync(HttpRequest.builder()
+                .attributes(attributes)
+                .method(HttpMethod.GET)
+                .url(url)
+                .build());
+    }
+
+    @Override
     public CompletableFuture<HttpResponse> executeAsyncGet(String url, Content content) {
         return executeAsync(HttpRequest.builder()
                 .method(HttpMethod.GET)
@@ -721,6 +811,15 @@ public abstract class AbstractHttpClient implements HttpClient {
     @Override
     public CompletableFuture<HttpResponse> executeAsyncDelete(String url) {
         return executeAsync(HttpRequest.builder()
+                .method(HttpMethod.DELETE)
+                .url(url)
+                .build());
+    }
+
+    @Override
+    public CompletableFuture<HttpResponse> executeAsyncDelete(String url, Attributes attributes) {
+        return executeAsync(HttpRequest.builder()
+                .attributes(attributes)
                 .method(HttpMethod.DELETE)
                 .url(url)
                 .build());
@@ -796,6 +895,15 @@ public abstract class AbstractHttpClient implements HttpClient {
     }
 
     @Override
+    public CompletableFuture<HttpResponse> executeAsyncPost(String url, Attributes attributes) {
+        return executeAsync(HttpRequest.builder()
+                .attributes(attributes)
+                .method(HttpMethod.POST)
+                .url(url)
+                .build());
+    }
+
+    @Override
     public CompletableFuture<HttpResponse> executeAsyncPost(String url, Content content) {
         return executeAsync(HttpRequest.builder()
                 .method(HttpMethod.POST)
@@ -859,6 +967,15 @@ public abstract class AbstractHttpClient implements HttpClient {
     @Override
     public CompletableFuture<HttpResponse> executeAsyncPut(String url) {
         return executeAsync(HttpRequest.builder()
+                .method(HttpMethod.PUT)
+                .url(url)
+                .build());
+    }
+
+    @Override
+    public CompletableFuture<HttpResponse> executeAsyncPut(String url, Attributes attributes) {
+        return executeAsync(HttpRequest.builder()
+                .attributes(attributes)
                 .method(HttpMethod.PUT)
                 .url(url)
                 .build());
@@ -934,6 +1051,15 @@ public abstract class AbstractHttpClient implements HttpClient {
     }
 
     @Override
+    public CompletableFuture<HttpResponse> executeAsyncTrace(String url, Attributes attributes) {
+        return executeAsync(HttpRequest.builder()
+                .attributes(attributes)
+                .method(HttpMethod.TRACE)
+                .url(url)
+                .build());
+    }
+
+    @Override
     public CompletableFuture<HttpResponse> executeAsyncTrace(String url, Content content) {
         return executeAsync(HttpRequest.builder()
                 .method(HttpMethod.TRACE)
@@ -997,6 +1123,15 @@ public abstract class AbstractHttpClient implements HttpClient {
     @Override
     public CompletableFuture<HttpResponse> executeAsyncHead(String url) {
         return executeAsync(HttpRequest.builder()
+                .method(HttpMethod.HEAD)
+                .url(url)
+                .build());
+    }
+
+    @Override
+    public CompletableFuture<HttpResponse> executeAsyncHead(String url, Attributes attributes) {
+        return executeAsync(HttpRequest.builder()
+                .attributes(attributes)
                 .method(HttpMethod.HEAD)
                 .url(url)
                 .build());
@@ -1072,6 +1207,15 @@ public abstract class AbstractHttpClient implements HttpClient {
     }
 
     @Override
+    public CompletableFuture<HttpResponse> executeAsyncOptions(String url, Attributes attributes) {
+        return executeAsync(HttpRequest.builder()
+                .attributes(attributes)
+                .method(HttpMethod.OPTIONS)
+                .url(url)
+                .build());
+    }
+
+    @Override
     public CompletableFuture<HttpResponse> executeAsyncOptions(String url, Content content) {
         return executeAsync(HttpRequest.builder()
                 .method(HttpMethod.OPTIONS)
@@ -1141,6 +1285,15 @@ public abstract class AbstractHttpClient implements HttpClient {
     }
 
     @Override
+    public CompletableFuture<HttpResponse> executeAsyncConnect(String url, Attributes attributes) {
+        return executeAsync(HttpRequest.builder()
+                .attributes(attributes)
+                .method(HttpMethod.CONNECT)
+                .url(url)
+                .build());
+    }
+
+    @Override
     public CompletableFuture<HttpResponse> executeAsyncConnect(String url, Content content) {
         return executeAsync(HttpRequest.builder()
                 .method(HttpMethod.CONNECT)
@@ -1204,6 +1357,15 @@ public abstract class AbstractHttpClient implements HttpClient {
     @Override
     public CompletableFuture<HttpResponse> executeAsyncPatch(String url) {
         return executeAsync(HttpRequest.builder()
+                .method(HttpMethod.PATCH)
+                .url(url)
+                .build());
+    }
+
+    @Override
+    public CompletableFuture<HttpResponse> executeAsyncPatch(String url, Attributes attributes) {
+        return executeAsync(HttpRequest.builder()
+                .attributes(attributes)
                 .method(HttpMethod.PATCH)
                 .url(url)
                 .build());

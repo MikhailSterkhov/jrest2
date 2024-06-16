@@ -1,16 +1,17 @@
-package com.jrest.http.client.test;
+package com.jrest.http.client.test.https;
 
 import com.jrest.http.client.HttpClient;
 import com.jrest.http.client.HttpClients;
 
-public class HttpClientTest {
+public class HttpClientUrlTest {
 
     public static void main(String[] args) {
         HttpClient httpClient = HttpClients.createClient();
 
-        httpClient.executeOptions("https://catfact.ninja/fact")
+        httpClient.executeGet("https://catfact.ninja/fact")
                 .ifPresent(httpResponse -> {
 
+                    System.out.println(httpResponse.getProtocol());
                     System.out.println(httpResponse.getHeaders().getFirst(null));
                     //  HTTP/1.1 200 OK
                     System.out.println(httpResponse.getCode());

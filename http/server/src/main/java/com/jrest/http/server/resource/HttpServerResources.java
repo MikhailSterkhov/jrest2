@@ -5,8 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.util.Collections;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @ToString
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -16,21 +16,17 @@ public class HttpServerResources {
         return new HttpServerResources();
     }
 
-    private final Set<HttpResourceUnit> units = new CopyOnWriteArraySet<>();
+    private final List<HttpResourceUnit> units = new CopyOnWriteArrayList<>();
 
     public void register(HttpResourceUnit resourceUnit) {
-        if (!units.add(resourceUnit)) {
-            throw new HttpServerResourceException("Resource uri `" + resourceUnit.getPath().toURI() + "` is already registered");
-        }
+        units.add(resourceUnit);
     }
 
     public void unregister(HttpResourceUnit resourceUnit) {
-        if (!units.remove(resourceUnit)) {
-            throw new HttpServerResourceException("Resource uri `" + resourceUnit.getPath().toURI() + "` is not registered");
-        }
+        units.remove(resourceUnit);
     }
 
-    public Set<HttpResourceUnit> getAllResourcesUnits() {
-        return Collections.unmodifiableSet(units);
+    public List<HttpResourceUnit> getAllResourcesUnits() {
+        return Collections.unmodifiableList(units);
     }
 }

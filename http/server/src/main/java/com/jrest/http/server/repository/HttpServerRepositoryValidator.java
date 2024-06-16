@@ -3,8 +3,6 @@ package com.jrest.http.server.repository;
 import com.jrest.http.server.resource.HttpServerResourceException;
 import com.jrest.mvc.model.HttpRequest;
 import com.jrest.mvc.model.HttpResponse;
-import com.jrest.mvc.persistence.HttpAsync;
-import com.jrest.mvc.persistence.HttpServer;
 import com.jrest.mvc.persistence.util.HttpMvcMappersUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +14,6 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class HttpServerRepositoryValidator {
-
     public static HttpServerRepositoryValidator fromRepository(Object object) {
         return new HttpServerRepositoryValidator(object, object.getClass());
     }
@@ -25,7 +22,7 @@ public class HttpServerRepositoryValidator {
     private final Class<?> repositoryClass;
 
     public boolean isHttpServer() {
-        return repositoryClass.isAnnotationPresent(HttpServer.class);
+        return HttpMvcMappersUtil.isAnnotatedAsHttpServer(repositoryClass);
     }
 
     public List<HttpRepositoryHandler> findRepositoryHandlers() {
@@ -36,10 +33,11 @@ public class HttpServerRepositoryValidator {
     }
 
     private HttpRepositoryHandler toHandler(Method method) {
+        method.setAccessible(true);
         return HttpRepositoryHandler.builder()
                 .uri(HttpMvcMappersUtil.findUri(method))
                 .httpMethod(HttpMvcMappersUtil.toHttpMethod(method))
-                .isAsynchronous(method.isAnnotationPresent(HttpAsync.class))
+                .isAsynchronous(HttpMvcMappersUtil.isAnnotatedAsAsync(method))
                 .invocation(request -> invoke(request, method))
                 .build();
     }
@@ -49,7 +47,7 @@ public class HttpServerRepositoryValidator {
             throw new HttpServerResourceException("Method `" + method + "` must be return HttpResponse type");
         }
         try {
-            Object[] args = method.getParameterCount() > 1 ? new Object[]{request} : new Object[0];
+            Object[] args = method.getParameterCount() > 0 ? new Object[]{request} : new Object[0];
             return (HttpResponse) method.invoke(repository, args);
         }
         catch (Exception exception) {

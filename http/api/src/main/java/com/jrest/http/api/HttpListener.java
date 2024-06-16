@@ -5,5 +5,7 @@ import com.jrest.mvc.model.HttpResponse;
 
 public interface HttpListener {
 
+    HttpResponse SKIP_ACTION = null;
+
     HttpResponse process(HttpRequest request);
 }

@@ -13,8 +13,49 @@ public class HttpClients {
                 .build();
     }
 
+    public HttpClient createSocketClient(ExecutorService executorService, boolean keepAlive) {
+        return SocketHttpClient.builder()
+                .executorService(executorService)
+                .keepAlive(keepAlive)
+                .build();
+    }
+
+    public HttpClient createSocketClient(ExecutorService executorService, int connectTimeout) {
+        return SocketHttpClient.builder()
+                .executorService(executorService)
+                .connectTimeout(connectTimeout)
+                .build();
+    }
+
+    public HttpClient createSocketClient(ExecutorService executorService, int connectTimeout, boolean keepAlive) {
+        return SocketHttpClient.builder()
+                .executorService(executorService)
+                .connectTimeout(connectTimeout)
+                .keepAlive(keepAlive)
+                .build();
+    }
+
     public HttpClient createSocketClient() {
         return createSocketClient(null);
+    }
+
+    public HttpClient createSocketClient(boolean keepAlive) {
+        return SocketHttpClient.builder()
+                .keepAlive(keepAlive)
+                .build();
+    }
+
+    public HttpClient createSocketClient(int connectTimeout) {
+        return SocketHttpClient.builder()
+                .connectTimeout(connectTimeout)
+                .build();
+    }
+
+    public HttpClient createSocketClient(int connectTimeout, boolean keepAlive) {
+        return SocketHttpClient.builder()
+                .connectTimeout(connectTimeout)
+                .keepAlive(keepAlive)
+                .build();
     }
 
     public HttpClient createClient(ExecutorService executorService) {

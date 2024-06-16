@@ -21,10 +21,19 @@ public class Attributes {
      * @return новый объект Attributes.
      */
     public static Attributes newAttributes() {
-        return new Attributes();
+        return new Attributes(new Properties());
     }
 
-    private final Properties properties = new Properties();
+    /**
+     * Создает новый объект Attributes.
+     *
+     * @return новый объект Attributes.
+     */
+    public static Attributes fromProperties(Properties properties) {
+        return new Attributes(properties);
+    }
+
+    private final Properties properties;
 
     /**
      * Возвращает строковое значение параметра по его имени.

@@ -21,7 +21,7 @@ public class Headers {
      * @return новый объект Headers.
      */
     public static Headers newHeaders() {
-        return new Headers(new HashMap<>());
+        return new Headers(new LinkedHashMap<>());
     }
 
     /**
@@ -34,7 +34,7 @@ public class Headers {
         return new Headers(map);
     }
 
-    private final Map<String, List<String>> headers;
+    private final Map<String, List<String>> map;
 
     /**
      * Добавляет новое значение к заголовку. Если заголовок не существует, он будет создан.
@@ -44,12 +44,12 @@ public class Headers {
      * @return текущий объект Headers.
      */
     public Headers add(String header, Object value) {
-        List<String> strings = headers.get(header);
+        List<String> strings = map.get(header);
         if (strings == null) {
             strings = new ArrayList<>();
         }
         strings.add(value.toString());
-        headers.put(header, strings);
+        map.put(header, strings);
         return this;
     }
 
@@ -64,7 +64,7 @@ public class Headers {
         if (value == null) {
             return this;
         }
-        headers.put(header, new ArrayList<>(Collections.singletonList(value.toString())));
+        map.put(header, new ArrayList<>(Collections.singletonList(value.toString())));
         return this;
     }
 
@@ -76,9 +76,12 @@ public class Headers {
      * @return текущий объект Headers.
      */
     public Headers remove(String header, Object value) {
-        List<String> values = headers.get(header);
+        List<String> values = map.get(header);
         if (values != null) {
             values.remove(value.toString());
+            if (values.isEmpty()) {
+                map.remove(header);
+            }
         }
         return this;
     }
@@ -90,7 +93,7 @@ public class Headers {
      * @return текущий объект Headers.
      */
     public Headers removeFull(String header) {
-        headers.remove(header);
+        map.remove(header);
         return this;
     }
 
@@ -100,8 +103,29 @@ public class Headers {
      * @return текущий объект Headers.
      */
     public Headers clear() {
-        headers.clear();
+        map.clear();
         return this;
+    }
+
+    /**
+     * Проверить на наличие кешированных ранее значений
+     * заголовка.
+     *
+     * @param header - проверяемый заголовок
+     */
+    public boolean has(String header) {
+        return map.containsKey(header) && !map.get(header).isEmpty();
+    }
+
+    /**
+     * Проверить на наличие кешированных ранее значений
+     * заголовка и наличия его значения.
+     *
+     * @param header - проверяемый заголовок
+     * @param value - проверяемое значение заголовка
+     */
+    public boolean has(String header, Object value) {
+        return has(header) && get(header).contains(value.toString());
     }
 
     /**
@@ -111,7 +135,15 @@ public class Headers {
      * @return список значений заголовка.
      */
     public List<String> get(String header) {
-        return headers.getOrDefault(header, new ArrayList<>());
+        return map.getOrDefault(header, new ArrayList<>());
+    }
+
+    /**
+     * Получить список ранее кешированных заголовков.
+     * @return Возвращает список кешированных названий заголовков.
+     */
+    public Set<String> keys() {
+        return Collections.unmodifiableSet(map.keySet());
     }
 
     /**
@@ -121,14 +153,31 @@ public class Headers {
      * @return первое значение заголовка, или null, если заголовок не существует.
      */
     public String getFirst(String header) {
+        if (!has(header)) {
+            return null;
+        }
         Iterator<String> valuesIterator = get(header).iterator();
-        return valuesIterator.hasNext() ? valuesIterator.next() : null;
+        return valuesIterator.next();
+    }
+
+    /**
+     * Возвращает последнее значение для заданного заголовка.
+     *
+     * @param header имя заголовка.
+     * @return последнее значение заголовка, или null, если заголовок не существует.
+     */
+    public String getLast(String header) {
+        if (!has(header)) {
+            return null;
+        }
+        List<String> values = get(header);
+        return values.get(values.size() - 1);
     }
 
     /**
      * Класс Defaults содержит набор стандартных HTTP-заголовков.
      */
-    public static final class Defaults {
+    public static final class Def {
         public static final String ACCEPT  = "Accept";
         public static final String ACCEPT_CHARSET = "Accept-Charset";
         public static final String ACCEPT_ENCODING = "Accept-Encoding";

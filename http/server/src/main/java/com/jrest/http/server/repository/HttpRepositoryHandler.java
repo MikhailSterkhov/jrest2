@@ -18,6 +18,6 @@ public class HttpRepositoryHandler {
     private final boolean isAsynchronous;
 
     public boolean canProcess(HttpRequest httpRequest) {
-        return httpRequest.getUri().equals(getUri()) && httpRequest.getMethod().equals(getHttpMethod());
+        return (httpMethod == HttpMethod.ALL || httpRequest.getMethod().equals(getHttpMethod()));
     }
 }

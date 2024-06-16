@@ -39,7 +39,22 @@ public class InputStreamUtil {
      */
     public byte[] toBytesArray(InputStream inputStream) {
         try {
-            byte[] bytes = new byte[inputStream.available()];
+            return toBytesArray(inputStream, inputStream.available());
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
+    /**
+     * Преобразует InputStream в массив байтов.
+     *
+     * @param inputStream InputStream для преобразования
+     * @return массив байтов, содержащий данные из InputStream
+     * @throws RuntimeException если происходит IOException при чтении из InputStream
+     */
+    public byte[] toBytesArray(InputStream inputStream, int length) {
+        try {
+            byte[] bytes = new byte[length];
             inputStream.read(bytes);
             return bytes;
         } catch (IOException exception) {

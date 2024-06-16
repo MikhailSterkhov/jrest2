@@ -7,7 +7,7 @@ import com.jrest.mvc.model.ResponseCode;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
-public class HttpServerStartTest {
+public class HttpServerListenersStartTest {
 
     public static void main(String[] args) {
         HttpServer httpServer = HttpServer.builder()

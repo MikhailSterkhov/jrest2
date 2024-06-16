@@ -48,6 +48,14 @@ public interface HttpClient extends Serializable {
     Optional<HttpResponse> executeGet(String url);
 
     /**
+     * Выполняет HTTP GET запрос по-указанному URL.
+     *
+     * @param url URL для запроса.
+     * @return объект HttpResponse, обернутый в Optional.
+     */
+    Optional<HttpResponse> executeGet(String url, Attributes attributes);
+
+    /**
      * Выполняет HTTP GET запрос по-указанному URL с указанным контентом.
      *
      * @param url URL для запроса.
@@ -109,7 +117,7 @@ public interface HttpClient extends Serializable {
     //
 
     /**
-     * Выполняет HTTP POST запрос по-указанному URL.
+     * Выполняет HTTP DELETE запрос по-указанному URL.
      *
      * @param url URL для запроса.
      * @return объект HttpResponse, обернутый в Optional.
@@ -117,7 +125,15 @@ public interface HttpClient extends Serializable {
     Optional<HttpResponse> executeDelete(String url);
 
     /**
-     * Выполняет HTTP POST запрос по-указанному URL с указанным контентом.
+     * Выполняет HTTP DELETE запрос по-указанному URL.
+     *
+     * @param url URL для запроса.
+     * @return объект HttpResponse, обернутый в Optional.
+     */
+    Optional<HttpResponse> executeDelete(String url, Attributes attributes);
+
+    /**
+     * Выполняет HTTP DELETE запрос по-указанному URL с указанным контентом.
      *
      * @param url URL для запроса.
      * @param content контент запроса.
@@ -126,7 +142,7 @@ public interface HttpClient extends Serializable {
     Optional<HttpResponse> executeDelete(String url, Content content);
 
     /**
-     * Выполняет HTTP POST запрос по-указанному URL с указанными заголовками.
+     * Выполняет HTTP DELETE запрос по-указанному URL с указанными заголовками.
      *
      * @param url URL для запроса.
      * @param headers заголовки запроса.
@@ -135,7 +151,7 @@ public interface HttpClient extends Serializable {
     Optional<HttpResponse> executeDelete(String url, Headers headers);
 
     /**
-     * Выполняет HTTP POST запрос по-указанному URL с указанным контентом и заголовками.
+     * Выполняет HTTP DELETE запрос по-указанному URL с указанным контентом и заголовками.
      *
      * @param url URL для запроса.
      * @param content контент запроса.
@@ -145,7 +161,7 @@ public interface HttpClient extends Serializable {
     Optional<HttpResponse> executeDelete(String url, Content content, Headers headers);
 
     /**
-     * Выполняет HTTP POST запрос по-указанному URL с указанными атрибутами и контентом.
+     * Выполняет HTTP DELETE запрос по-указанному URL с указанными атрибутами и контентом.
      *
      * @param url URL для запроса.
      * @param attributes атрибуты запроса.
@@ -155,7 +171,7 @@ public interface HttpClient extends Serializable {
     Optional<HttpResponse> executeDelete(String url, Attributes attributes, Content content);
 
     /**
-     * Выполняет HTTP POST запрос по-указанному URL с указанными атрибутами и заголовками.
+     * Выполняет HTTP DELETE запрос по-указанному URL с указанными атрибутами и заголовками.
      *
      * @param url URL для запроса.
      * @param attributes атрибуты запроса.
@@ -165,7 +181,7 @@ public interface HttpClient extends Serializable {
     Optional<HttpResponse> executeDelete(String url, Attributes attributes, Headers headers);
 
     /**
-     * Выполняет HTTP POST запрос по-указанному URL с указанными атрибутами, контентом и заголовками.
+     * Выполняет HTTP DELETE запрос по-указанному URL с указанными атрибутами, контентом и заголовками.
      *
      * @param url URL для запроса.
      * @param attributes атрибуты запроса.
@@ -184,6 +200,14 @@ public interface HttpClient extends Serializable {
      * @return объект HttpResponse, обернутый в Optional.
      */
     Optional<HttpResponse> executePost(String url);
+
+    /**
+     * Выполняет HTTP POST запрос по-указанному URL.
+     *
+     * @param url URL для запроса.
+     * @return объект HttpResponse, обернутый в Optional.
+     */
+    Optional<HttpResponse> executePost(String url, Attributes attributes);
 
     /**
      * Выполняет HTTP POST запрос по-указанному URL с указанным контентом.
@@ -255,6 +279,14 @@ public interface HttpClient extends Serializable {
     Optional<HttpResponse> executePut(String url);
 
     /**
+     * Выполняет HTTP PUT запрос по-указанному URL.
+     *
+     * @param url URL для запроса.
+     * @return объект HttpResponse, обернутый в Optional.
+     */
+    Optional<HttpResponse> executePut(String url, Attributes attributes);
+
+    /**
      * Выполняет HTTP PUT запрос по-указанному URL с указанным контентом.
      *
      * @param url URL для запроса.
@@ -322,6 +354,14 @@ public interface HttpClient extends Serializable {
      * @return объект HttpResponse, обернутый в Optional.
      */
     Optional<HttpResponse> executeTrace(String url);
+
+    /**
+     * Выполняет HTTP TRACE запрос по-указанному URL.
+     *
+     * @param url URL для запроса.
+     * @return объект HttpResponse, обернутый в Optional.
+     */
+    Optional<HttpResponse> executeTrace(String url, Attributes attributes);
 
     /**
      * Выполняет HTTP TRACE запрос по-указанному URL с указанным контентом.
@@ -393,6 +433,14 @@ public interface HttpClient extends Serializable {
     Optional<HttpResponse> executeHead(String url);
 
     /**
+     * Выполняет HTTP HEAD запрос по-указанному URL.
+     *
+     * @param url URL для запроса.
+     * @return объект HttpResponse, обернутый в Optional.
+     */
+    Optional<HttpResponse> executeHead(String url, Attributes attributes);
+
+    /**
      * Выполняет HTTP HEAD запрос по-указанному URL с указанным контентом.
      *
      * @param url URL для запроса.
@@ -460,6 +508,14 @@ public interface HttpClient extends Serializable {
      * @return объект HttpResponse, обернутый в Optional.
      */
     Optional<HttpResponse> executeOptions(String url);
+
+    /**
+     * Выполняет HTTP OPTIONS запрос по-указанному URL.
+     *
+     * @param url URL для запроса.
+     * @return объект HttpResponse, обернутый в Optional.
+     */
+    Optional<HttpResponse> executeOptions(String url, Attributes attributes);
 
     /**
      * Выполняет HTTP OPTIONS запрос по-указанному URL с указанным контентом.
@@ -531,6 +587,14 @@ public interface HttpClient extends Serializable {
     Optional<HttpResponse> executeConnect(String url);
 
     /**
+     * Выполняет HTTP CONNECT запрос по-указанному URL.
+     *
+     * @param url URL для запроса.
+     * @return объект HttpResponse, обернутый в Optional.
+     */
+    Optional<HttpResponse> executeConnect(String url, Attributes attributes);
+
+    /**
      * Выполняет HTTP CONNECT запрос по-указанному URL с указанным контентом.
      *
      * @param url URL для запроса.
@@ -598,6 +662,14 @@ public interface HttpClient extends Serializable {
      * @return объект HttpResponse, обернутый в Optional.
      */
     Optional<HttpResponse> executePatch(String url);
+
+    /**
+     * Выполняет HTTP PATCH запрос по-указанному URL.
+     *
+     * @param url URL для запроса.
+     * @return объект HttpResponse, обернутый в Optional.
+     */
+    Optional<HttpResponse> executePatch(String url, Attributes attributes);
 
     /**
      * Выполняет HTTP PATCH запрос по-указанному URL с указанным контентом.
@@ -669,6 +741,15 @@ public interface HttpClient extends Serializable {
     CompletableFuture<HttpResponse> executeAsyncGet(String url);
 
     /**
+     * Выполняет HTTP GET запрос асинхронно по-указанному URL.
+     *
+     * @param url URL для запроса.
+     * @param attributes атрибуты запроса.
+     * @return объект HttpResponse, обернутый в Optional.
+     */
+    CompletableFuture<HttpResponse> executeAsyncGet(String url, Attributes attributes);
+
+    /**
      * Выполняет HTTP GET запрос асинхронно по-указанному URL с указанным контентом.
      *
      * @param url URL для запроса.
@@ -736,6 +817,15 @@ public interface HttpClient extends Serializable {
      * @return объект HttpResponse, обернутый в Optional.
      */
     CompletableFuture<HttpResponse> executeAsyncDelete(String url);
+
+    /**
+     * Выполняет HTTP DELETE запрос асинхронно по-указанному URL.
+     *
+     * @param url URL для запроса.
+     * @param attributes атрибуты запроса.
+     * @return объект HttpResponse, обернутый в Optional.
+     */
+    CompletableFuture<HttpResponse> executeAsyncDelete(String url, Attributes attributes);
 
     /**
      * Выполняет HTTP DELETE запрос асинхронно по-указанному URL с указанным контентом.
@@ -807,6 +897,15 @@ public interface HttpClient extends Serializable {
     CompletableFuture<HttpResponse> executeAsyncPost(String url);
 
     /**
+     * Выполняет HTTP POST запрос асинхронно по-указанному URL.
+     *
+     * @param url URL для запроса.
+     * @param attributes атрибуты запроса.
+     * @return объект HttpResponse, обернутый в Optional.
+     */
+    CompletableFuture<HttpResponse> executeAsyncPost(String url, Attributes attributes);
+
+    /**
      * Выполняет HTTP POST запрос асинхронно по-указанному URL с указанным контентом.
      *
      * @param url URL для запроса.
@@ -874,6 +973,15 @@ public interface HttpClient extends Serializable {
      * @return объект HttpResponse, обернутый в Optional.
      */
     CompletableFuture<HttpResponse> executeAsyncPut(String url);
+
+    /**
+     * Выполняет HTTP PUT запрос асинхронно по-указанному URL.
+     *
+     * @param url URL для запроса.
+     * @param attributes атрибуты запроса.
+     * @return объект HttpResponse, обернутый в Optional.
+     */
+    CompletableFuture<HttpResponse> executeAsyncPut(String url, Attributes attributes);
 
     /**
      * Выполняет HTTP PUT запрос асинхронно по-указанному URL с указанным контентом.
@@ -945,6 +1053,15 @@ public interface HttpClient extends Serializable {
     CompletableFuture<HttpResponse> executeAsyncTrace(String url);
 
     /**
+     * Выполняет HTTP TRACE запрос асинхронно по-указанному URL.
+     *
+     * @param url URL для запроса.
+     * @param attributes атрибуты запроса.
+     * @return объект HttpResponse, обернутый в Optional.
+     */
+    CompletableFuture<HttpResponse> executeAsyncTrace(String url, Attributes attributes);
+
+    /**
      * Выполняет HTTP TRACE запрос асинхронно по-указанному URL с указанным контентом.
      *
      * @param url URL для запроса.
@@ -1012,6 +1129,15 @@ public interface HttpClient extends Serializable {
      * @return объект HttpResponse, обернутый в Optional.
      */
     CompletableFuture<HttpResponse> executeAsyncHead(String url);
+
+    /**
+     * Выполняет HTTP HEAD запрос асинхронно по-указанному URL.
+     *
+     * @param url URL для запроса.
+     * @param attributes атрибуты запроса.
+     * @return объект HttpResponse, обернутый в Optional.
+     */
+    CompletableFuture<HttpResponse> executeAsyncHead(String url, Attributes attributes);
 
     /**
      * Выполняет HTTP HEAD запрос асинхронно по-указанному URL с указанным контентом.
@@ -1083,6 +1209,15 @@ public interface HttpClient extends Serializable {
     CompletableFuture<HttpResponse> executeAsyncOptions(String url);
 
     /**
+     * Выполняет HTTP OPTIONS запрос асинхронно по-указанному URL.
+     *
+     * @param url URL для запроса.
+     * @param attributes атрибуты запроса.
+     * @return объект HttpResponse, обернутый в Optional.
+     */
+    CompletableFuture<HttpResponse> executeAsyncOptions(String url, Attributes attributes);
+
+    /**
      * Выполняет HTTP OPTIONS запрос асинхронно по-указанному URL с указанным контентом.
      *
      * @param url URL для запроса.
@@ -1152,6 +1287,15 @@ public interface HttpClient extends Serializable {
     CompletableFuture<HttpResponse> executeAsyncConnect(String url);
 
     /**
+     * Выполняет HTTP CONNECT запрос асинхронно по-указанному URL.
+     *
+     * @param url URL для запроса.
+     * @param attributes атрибуты запроса.
+     * @return объект HttpResponse, обернутый в Optional.
+     */
+    CompletableFuture<HttpResponse> executeAsyncConnect(String url, Attributes attributes);
+
+    /**
      * Выполняет HTTP CONNECT запрос асинхронно по-указанному URL с указанным контентом.
      *
      * @param url URL для запроса.
@@ -1219,6 +1363,15 @@ public interface HttpClient extends Serializable {
      * @return объект HttpResponse, обернутый в Optional.
      */
     CompletableFuture<HttpResponse> executeAsyncPatch(String url);
+
+    /**
+     * Выполняет HTTP PATCH запрос асинхронно по-указанному URL.
+     *
+     * @param url URL для запроса.
+     * @param attributes атрибуты запроса.
+     * @return объект HttpResponse, обернутый в Optional.
+     */
+    CompletableFuture<HttpResponse> executeAsyncPatch(String url, Attributes attributes);
 
     /**
      * Выполняет HTTP PATCH запрос асинхронно по-указанному URL с указанным контентом.
