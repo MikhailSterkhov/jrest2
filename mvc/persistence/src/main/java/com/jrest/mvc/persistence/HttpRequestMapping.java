@@ -11,5 +11,5 @@ public @interface HttpRequestMapping {
 
     String method() default "*";
 
-    String path() default "/";
+    String path() default "*";
 }

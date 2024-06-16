@@ -11,6 +11,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.nio.file.Files;
 import java.security.KeyStore;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
@@ -49,6 +50,7 @@ public class HttpServerSocketChannel {
         executorService.submit(() -> {
             while (true) {
                 SocketChannel socketChannel = serverSocketChannel.accept();
+
                 if (socketChannel != null) {
                     handleClient(socketChannel.socket());
                 }
@@ -69,14 +71,21 @@ public class HttpServerSocketChannel {
         });
     }
 
-    private SSLContext createSSLContext() {
+    private SSLContext createSSLContext() throws FileNotFoundException {
+        File keystorePathFile = new File(config.getKeystorePath());
+        if (!keystorePathFile.exists()) {
+            throw new FileNotFoundException(config.getKeystorePath());
+        }
         try {
             SSLContext sslContext = SSLContext.getInstance("TLS");
             KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+
             KeyStore keyStore = KeyStore.getInstance("JKS");
-            keyStore.load(new FileInputStream(config.getKeystorePath()), config.getKeystorePassword().toCharArray());
+            keyStore.load(Files.newInputStream(keystorePathFile.toPath()), config.getKeystorePassword().toCharArray());
             keyManagerFactory.init(keyStore, config.getKeyPassword().toCharArray());
+
             sslContext.init(keyManagerFactory.getKeyManagers(), null, null);
+
             return sslContext;
         } catch (Exception e) {
             throw new HttpSocketException("Failed to initialize SSL context", e);
@@ -120,14 +129,14 @@ public class HttpServerSocketChannel {
                 requestHandler.accept(clientChannel, request);
 
             } catch (IOException e) {
-                throw new HttpSocketException(e);
+                e.printStackTrace();
             } finally {
                 try {
                     if (!config.isKeepAlive()) {
                         socket.close();
                     }
                 } catch (IOException e) {
-                    throw new HttpSocketException(e);
+                    e.printStackTrace();
                 }
             }
         });

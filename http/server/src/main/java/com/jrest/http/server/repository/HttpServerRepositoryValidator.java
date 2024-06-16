@@ -1,5 +1,6 @@
 package com.jrest.http.server.repository;
 
+import com.jrest.http.api.HttpListener;
 import com.jrest.http.server.resource.HttpServerResourceException;
 import com.jrest.mvc.model.HttpRequest;
 import com.jrest.mvc.model.HttpResponse;
@@ -25,9 +26,16 @@ public class HttpServerRepositoryValidator {
         return HttpMvcMappersUtil.isAnnotatedAsHttpServer(repositoryClass);
     }
 
-    public List<HttpRepositoryHandler> findRepositoryHandlers() {
+    public List<HttpRepositoryHandler> findProcessingHandlers() {
         return Arrays.stream(repositoryClass.getMethods())
                 .filter(HttpMvcMappersUtil::isAnnotatedAsRequestMapping)
+                .map(this::toHandler)
+                .collect(Collectors.toList());
+    }
+
+    public List<HttpRepositoryHandler> findBeforeHandlers() {
+        return Arrays.stream(repositoryClass.getMethods())
+                .filter(HttpMvcMappersUtil::isAnnotatedAsBeforeExecution)
                 .map(this::toHandler)
                 .collect(Collectors.toList());
     }
@@ -43,11 +51,16 @@ public class HttpServerRepositoryValidator {
     }
 
     private HttpResponse invoke(HttpRequest request, Method method) {
-        if (!method.getReturnType().equals(HttpResponse.class)) {
+        boolean isVoid = method.getReturnType().equals(void.class);
+        if (!method.getReturnType().equals(HttpResponse.class) && !isVoid) {
             throw new HttpServerResourceException("Method `" + method + "` must be return HttpResponse type");
         }
         try {
             Object[] args = method.getParameterCount() > 0 ? new Object[]{request} : new Object[0];
+            if (isVoid) {
+                method.invoke(repository, args);
+                return HttpListener.SKIP_ACTION;
+            }
             return (HttpResponse) method.invoke(repository, args);
         }
         catch (Exception exception) {

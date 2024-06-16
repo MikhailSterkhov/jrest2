@@ -2,6 +2,7 @@ package com.jrest.http.client.test.localhost;
 
 import com.jrest.http.client.HttpClient;
 import com.jrest.http.client.HttpClients;
+import com.jrest.mvc.model.Headers;
 
 public class HttpClientUrlTest {
 
@@ -12,8 +13,9 @@ public class HttpClientUrlTest {
                 .ifPresent(httpResponse -> {
 
                     System.out.println(httpResponse.getProtocol());
+                    //  HTTP/1.1
                     System.out.println(httpResponse.getHeaders().getFirst(null));
-                    //  HTTP/1.1 200 OK
+                    // HTTP/1.1 200 OK
                     System.out.println(httpResponse.getCode());
                     //  200 OK
 

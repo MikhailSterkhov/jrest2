@@ -9,10 +9,7 @@ import com.jrest.http.server.repository.HttpServerRepositoryValidator;
 import com.jrest.http.server.resource.HttpResourcePath;
 import com.jrest.http.server.resource.HttpResourceUnit;
 import com.jrest.http.server.resource.HttpServerResources;
-import com.jrest.mvc.model.HttpProtocol;
-import com.jrest.mvc.model.HttpRequest;
-import com.jrest.mvc.model.HttpResponse;
-import com.jrest.mvc.model.ResponseCode;
+import com.jrest.mvc.model.*;
 import lombok.Builder;
 
 import java.io.IOException;
@@ -24,6 +21,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 public class HttpServer {
 
@@ -31,8 +29,10 @@ public class HttpServer {
     private final ExecutorService executorService;
 
     private final HttpServerResources resources = HttpServerResources.create();
+    private final HttpServerResources beforeResources = HttpServerResources.create();
 
     private final List<HttpListener> asyncListeners = new CopyOnWriteArrayList<>();
+    private final List<HttpListener> asyncBeforeListeners = new CopyOnWriteArrayList<>();
 
     private final HttpProtocol protocol;
     private HttpServerSocketChannel httpServerSocketChannel;
@@ -65,6 +65,13 @@ public class HttpServer {
 
             httpServerSocketChannel = new HttpServerSocketChannel(config, executorService,
                     (clientChannel, request) -> {
+                        if (request.getHeaders() == null) {
+                            request.setHeaders(Headers.newHeaders());
+                        }
+                        if (request.getAttributes() == null) {
+                            request.setAttributes(Attributes.newAttributes());
+                        }
+
                         Optional<HttpResponse> httpResponseOptional = processHttpRequest(request)
                                 .map(httpResponse -> httpResponse.toBuilder().protocol(protocol).build());
 
@@ -99,6 +106,24 @@ public class HttpServer {
         httpServerSocketChannel.shutdown();
     }
 
+    public void registerBeforeListener(String uri, Consumer<HttpRequest> listener) {
+        beforeResources.register(
+                HttpResourceUnit.builder()
+                        .path(HttpResourcePath.fromUri(uri))
+                        .listener((httpRequest -> { listener.accept(httpRequest); return HttpListener.SKIP_ACTION; }))
+                        .build());
+    }
+
+    public void registerAsyncBeforeListener(String uri, Consumer<HttpRequest> listener) {
+        HttpListener httpListener = (httpRequest -> { listener.accept(httpRequest); return HttpListener.SKIP_ACTION; });
+        beforeResources.register(
+                HttpResourceUnit.builder()
+                        .path(HttpResourcePath.fromUri(uri))
+                        .listener(httpListener)
+                        .build());
+        asyncBeforeListeners.add(httpListener);
+    }
+
     public void registerListener(String uri, HttpListener listener) {
         resources.register(
                 HttpResourceUnit.builder()
@@ -110,6 +135,14 @@ public class HttpServer {
     public void registerAsyncListener(String uri, HttpListener listener) {
         registerListener(uri, listener);
         asyncListeners.add(listener);
+    }
+
+    public void registerBeforeListener(Consumer<HttpRequest> listener) {
+        registerBeforeListener("*", listener);
+    }
+
+    public void registerAsyncBeforeListener(Consumer<HttpRequest> listener) {
+        registerAsyncBeforeListener("*", listener);
     }
 
     public void registerListener(HttpListener listener) {
@@ -126,47 +159,63 @@ public class HttpServer {
             throw new HttpServerRepositoryException("Repository " + repository.getClass() + " is not annotated as @HttpServer");
         }
 
-        List<HttpRepositoryHandler> repositoryHandlers = validator.findRepositoryHandlers();
-
-        for (HttpRepositoryHandler repositoryHandler : repositoryHandlers) {
-            doRegisterAsListener(repositoryHandler);
+        for (HttpRepositoryHandler repositoryHandler : validator.findProcessingHandlers()) {
+            registerHandler(repositoryHandler);
+        }
+        for (HttpRepositoryHandler repositoryHandler : validator.findBeforeHandlers()) {
+            registerBeforeHandler(repositoryHandler);
         }
     }
 
-    private void doRegisterAsListener(HttpRepositoryHandler repositoryHandler) {
-        HttpListener listener = (request) -> {
-
+    private HttpListener toHttpListener(HttpRepositoryHandler repositoryHandler) {
+        return (request) -> {
             if (repositoryHandler.canProcess(request)) {
                 return repositoryHandler.getInvocation().process(request);
             }
 
             return HttpListener.SKIP_ACTION;
         };
+    }
 
+    private void registerHandler(HttpRepositoryHandler repositoryHandler) {
+        HttpListener httpListener = toHttpListener(repositoryHandler);
         String uri = repositoryHandler.getUri();
+
         if (repositoryHandler.isAsynchronous()) {
-            registerAsyncListener(uri, listener);
+            registerAsyncListener(uri, httpListener);
         } else {
-            registerListener(uri, listener);
+            registerListener(uri, httpListener);
+        }
+    }
+
+    private void registerBeforeHandler(HttpRepositoryHandler repositoryHandler) {
+        Consumer<HttpRequest> consumer = ((httpRequest) -> repositoryHandler.getInvocation().process(httpRequest));
+        String uri = repositoryHandler.getUri();
+
+        if (repositoryHandler.isAsynchronous()) {
+            registerBeforeListener(uri, consumer);
+        } else {
+            registerAsyncBeforeListener(uri, consumer);
         }
     }
 
     private Optional<HttpResponse> processHttpRequest(HttpRequest httpRequest) {
-        List<HttpResourceUnit> allResourcesUnits = resources.getAllResourcesUnits();
-        List<HttpResponse> responsesList = new ArrayList<>();
-
-        for (HttpResourceUnit httpResourceUnit : allResourcesUnits) {
-            if (!httpResourceUnit.isExpected("*") && !httpResourceUnit.isExpected(httpRequest.getUrl())) {
+        for (HttpResourceUnit beforeUnit : beforeResources.getAllResourcesUnits()) {
+            if (!beforeUnit.isExpected("*") && !beforeUnit.isExpected(httpRequest.getUrl())) {
                 continue;
             }
 
-            HttpResponse httpResponse = processHttpListener(httpRequest,
-                    httpResourceUnit.getListener()).join();
+            HttpListener httpListener = beforeUnit.getListener();
 
-            if (httpResponse != HttpListener.SKIP_ACTION) {
-                responsesList.add(httpResponse);
+            if (asyncBeforeListeners.contains(httpListener)) {
+                CompletableFuture.runAsync(() -> httpListener.process(httpRequest),
+                        executorService);
+            } else {
+                httpListener.process(httpRequest);
             }
         }
+
+        List<HttpResponse> responsesList = toResponsesList(httpRequest, resources.getAllResourcesUnits());
 
         if (responsesList.size() > 1) {
             throw new HttpServerException("Http request " + httpRequest.getMethod().getName() + " " + httpRequest.getPath() + " was proceed more then 1 responses");
@@ -175,11 +224,29 @@ public class HttpServer {
         return responsesList.stream().findFirst();
     }
 
+    private List<HttpResponse> toResponsesList(HttpRequest httpRequest, List<HttpResourceUnit> resourceUnits) {
+        List<HttpResponse> responsesList = new ArrayList<>();
+
+        for (HttpResourceUnit httpResourceUnit : resourceUnits) {
+            if (!httpResourceUnit.isExpected("*") && !httpResourceUnit.isExpected(httpRequest.getUrl())) {
+                continue;
+            }
+
+            HttpResponse httpResponse = processHttpListener(httpRequest, httpResourceUnit.getListener()).join();
+
+            if (httpResponse != HttpListener.SKIP_ACTION) {
+                responsesList.add(httpResponse);
+            }
+        }
+
+        return responsesList;
+    }
+
     private CompletableFuture<HttpResponse> processHttpListener(HttpRequest httpRequest, HttpListener listener) {
         if (asyncListeners.contains(listener)) {
-            return CompletableFuture.supplyAsync(() -> listener.process(httpRequest));
+            return CompletableFuture.supplyAsync(() -> listener.process(httpRequest),
+                    executorService);
         }
-        HttpResponse process = listener.process(httpRequest);
-        return CompletableFuture.completedFuture(process);
+        return CompletableFuture.completedFuture(listener.process(httpRequest));
     }
 }

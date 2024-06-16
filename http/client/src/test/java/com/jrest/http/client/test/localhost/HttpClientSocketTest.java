@@ -2,6 +2,7 @@ package com.jrest.http.client.test.localhost;
 
 import com.jrest.http.client.HttpClient;
 import com.jrest.http.client.HttpClients;
+import com.jrest.mvc.model.Headers;
 
 import java.util.concurrent.Executors;
 

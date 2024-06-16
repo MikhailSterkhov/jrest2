@@ -17,7 +17,10 @@ public class HttpServerListenersStartTest {
 
         httpServer.registerAsyncListener(request -> {
             System.out.println(request);
-            return HttpResponse.builder().code(ResponseCode.OK).build();
+
+            return HttpResponse.builder()
+                    .code(ResponseCode.OK)
+                    .build();
         });
 
         httpServer.bind();
