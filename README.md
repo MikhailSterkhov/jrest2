@@ -1,13 +1,13 @@
 <div align="center">
 
-# JREST
+<img src=".assets/jrest2.png" alt="drawing"/>
 
-<img src="https://img.shields.io/badge/lang-Java-red?style=flat" />
-<img src="https://img.shields.io/badge/version-1.0-gree?style=flat" />
+<br>
 
-A framework written and wrapped under the Java programming 
-language that provides the necessary data model for REST-specific 
-communication between channels.
+<img src="https://img.shields.io/badge/language-Java-red?style=flat" />
+<img src="https://img.shields.io/badge/release-1.0-gree?style=flat" />
+<img src="https://img.shields.io/badge/repository-jitpack.io-gold?style=flat" />
+<img src="https://img.shields.io/badge/build-maven-blue?style=flat" />
 
 ---
 
