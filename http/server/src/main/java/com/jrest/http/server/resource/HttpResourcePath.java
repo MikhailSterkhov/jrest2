@@ -6,48 +6,37 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.net.URI;
-import java.util.Optional;
 
+/**
+ * Класс для представления пути ресурса HTTP.
+ * Содержит методы для создания и сравнения путей ресурсов.
+ */
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class HttpResourcePath {
 
-    //private static final String URI_DELIMITER = "/";
+    /**
+     * Полный путь ресурса.
+     */
+    private final String full;
 
-    //public static HttpResourcePath fromUri(String uri) {
-    //    return new HttpResourcePath(uri, delegateToPaths(uri));
-    //}
-
+    /**
+     * Создает экземпляр {@code HttpResourcePath} из строки URI.
+     *
+     * @param uri строка URI
+     * @return экземпляр {@code HttpResourcePath}
+     */
     public static HttpResourcePath fromUri(String uri) {
         return new HttpResourcePath(uri);
     }
 
-    //private static String[] delegateToPaths(String uri) {
-    //    return Optional.of(uri)
-    //            .map(s -> s.startsWith(URI_DELIMITER) ? s.substring(1) : s)
-    //            .map(s -> s.split(URI_DELIMITER))
-    //            .orElseGet(() -> new String[]{uri});
-    //}
-
-    private final String full;
-    //private final String[] paths;
-
-    //public boolean isExpected(String otherUri) {
-    //    if (full.equalsIgnoreCase(otherUri)) {
-    //        return true;
-    //    }
-
-    //    int equals = 0;
-    //    for (String path : paths) {
-    //        if (otherUri.contains(path)) {
-    //            equals++;
-    //        }
-    //    }
-
-    //    return equals >= Math.max(1, paths.length - 2);
-    //}
-
+    /**
+     * Проверяет, соответствует ли запрашиваемый URI этому ресурсу.
+     *
+     * @param requestUri запрашиваемый URI
+     * @return {@code true}, если запрашиваемый URI соответствует этому ресурсу, иначе {@code false}
+     */
     boolean isExpected(String requestUri) {
         if (requestUri.contains("?")) {
             requestUri = requestUri.substring(0, requestUri.indexOf("?"));
@@ -55,6 +44,11 @@ public class HttpResourcePath {
         return requestUri.equalsIgnoreCase(full);
     }
 
+    /**
+     * Преобразует путь ресурса в объект {@code URI}.
+     *
+     * @return объект {@code URI}, представляющий путь ресурса
+     */
     public URI toURI() {
         return URI.create(full);
     }

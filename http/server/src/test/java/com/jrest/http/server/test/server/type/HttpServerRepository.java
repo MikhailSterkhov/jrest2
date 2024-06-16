@@ -3,9 +3,7 @@ package com.jrest.http.server.test.server.type;
 import com.jrest.http.server.test.employee.Employee;
 import com.jrest.http.server.test.employee.EmployeeJob;
 import com.jrest.mvc.model.*;
-import com.jrest.mvc.persistence.HttpBeforeExecution;
-import com.jrest.mvc.persistence.HttpGet;
-import com.jrest.mvc.persistence.HttpServer;
+import com.jrest.mvc.persistence.*;
 
 import java.util.Optional;
 
@@ -27,9 +25,7 @@ public class HttpServerRepository {
         Optional<Integer> attributeIdOptional = attributes.getInteger("id");
 
         if (!attributeIdOptional.isPresent()) {
-            return HttpResponse.builder()
-                    .code(ResponseCode.BAD_REQUEST)
-                    .build();
+            return HttpResponse.badRequest();
         }
         return HttpResponse.ok(Content.fromEntity(
                 Employee.builder()

@@ -23,6 +23,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
+/**
+ * Класс для создания и управления HTTP-сервером.
+ */
 public class HttpServer {
 
     private final InetSocketAddress socketAddress;
@@ -40,6 +43,15 @@ public class HttpServer {
     private final SslContent sslContent;
     private final HttpListener notFoundListener;
 
+    /**
+     * Конструктор для создания экземпляра HTTP-сервера.
+     *
+     * @param socketAddress   Адрес и порт для биндинга сервера.
+     * @param executorService Сервис для выполнения потоков, если не задан, используется кэшированный пул потоков.
+     * @param protocol        Протокол HTTP, по умолчанию HTTP/1.1.
+     * @param ssl             Настройки SSL для HTTPS, если null, используется HTTP.
+     * @param notFoundListener Слушатель для обработки запросов, которые не нашли соответствующего обработчика.
+     */
     @Builder
     public HttpServer(InetSocketAddress socketAddress, ExecutorService executorService, HttpProtocol protocol,
                       SslContent ssl, HttpListener notFoundListener) {
@@ -50,6 +62,10 @@ public class HttpServer {
         this.protocol = Optional.ofNullable(protocol).orElse(HttpProtocol.HTTP_1_1);
     }
 
+    /**
+     * Метод для биндинга сервера к указанному адресу и порту.
+     * Настраивает и запускает канал сервера.
+     */
     public void bind() {
         try {
             HttpServerSocketConfig config =
@@ -102,20 +118,41 @@ public class HttpServer {
         }
     }
 
+    /**
+     * Метод для завершения работы сервера.
+     */
     public void shutdown() {
         httpServerSocketChannel.shutdown();
     }
 
+    /**
+     * Регистрация синхронного слушателя, который выполняется перед основными обработчиками.
+     *
+     * @param uri      URI, на который будет реагировать слушатель.
+     * @param listener Слушатель, который будет обрабатывать запрос.
+     */
     public void registerBeforeListener(String uri, Consumer<HttpRequest> listener) {
         beforeResources.register(
                 HttpResourceUnit.builder()
                         .path(HttpResourcePath.fromUri(uri))
-                        .listener((httpRequest -> { listener.accept(httpRequest); return HttpListener.SKIP_ACTION; }))
+                        .listener((httpRequest -> {
+                            listener.accept(httpRequest);
+                            return HttpListener.SKIP_ACTION;
+                        }))
                         .build());
     }
 
+    /**
+     * Регистрация асинхронного слушателя, который выполняется перед основными обработчиками.
+     *
+     * @param uri      URI, на который будет реагировать слушатель.
+     * @param listener Слушатель, который будет обрабатывать запрос.
+     */
     public void registerAsyncBeforeListener(String uri, Consumer<HttpRequest> listener) {
-        HttpListener httpListener = (httpRequest -> { listener.accept(httpRequest); return HttpListener.SKIP_ACTION; });
+        HttpListener httpListener = (httpRequest -> {
+            listener.accept(httpRequest);
+            return HttpListener.SKIP_ACTION;
+        });
         beforeResources.register(
                 HttpResourceUnit.builder()
                         .path(HttpResourcePath.fromUri(uri))
@@ -124,6 +161,12 @@ public class HttpServer {
         asyncBeforeListeners.add(httpListener);
     }
 
+    /**
+     * Регистрация синхронного слушателя для обработки запросов.
+     *
+     * @param uri      URI, на который будет реагировать слушатель.
+     * @param listener Слушатель, который будет обрабатывать запрос.
+     */
     public void registerListener(String uri, HttpListener listener) {
         resources.register(
                 HttpResourceUnit.builder()
@@ -132,27 +175,59 @@ public class HttpServer {
                         .build());
     }
 
+    /**
+     * Регистрация асинхронного слушателя для обработки запросов.
+     *
+     * @param uri      URI, на который будет реагировать слушатель.
+     * @param listener Слушатель, который будет обрабатывать запрос.
+     */
     public void registerAsyncListener(String uri, HttpListener listener) {
         registerListener(uri, listener);
         asyncListeners.add(listener);
     }
 
+    /**
+     * Регистрация синхронного слушателя, который выполняется перед основными обработчиками для всех URI.
+     *
+     * @param listener Слушатель, который будет обрабатывать запрос.
+     */
     public void registerBeforeListener(Consumer<HttpRequest> listener) {
         registerBeforeListener("*", listener);
     }
 
+    /**
+     * Регистрация асинхронного слушателя, который выполняется перед основными обработчиками для всех URI.
+     *
+     * @param listener Слушатель, который будет обрабатывать запрос.
+     */
     public void registerAsyncBeforeListener(Consumer<HttpRequest> listener) {
         registerAsyncBeforeListener("*", listener);
     }
 
+    /**
+     * Регистрация синхронного слушателя для обработки запросов для всех URI.
+     *
+     * @param listener Слушатель, который будет обрабатывать запрос.
+     */
     public void registerListener(HttpListener listener) {
         registerListener("*", listener);
     }
 
+    /**
+     * Регистрация асинхронного слушателя для обработки запросов для всех URI.
+     *
+     * @param listener Слушатель, который будет обрабатывать запрос.
+     */
     public void registerAsyncListener(HttpListener listener) {
         registerAsyncListener("*", listener);
     }
 
+    /**
+     * Регистрация репозитория с обработчиками.
+     *
+     * @param repository Репозиторий, содержащий методы, аннотированные для обработки HTTP-запросов.
+     * @throws HttpServerRepositoryException если репозиторий не аннотирован как @HttpServer.
+     */
     public void registerRepository(Object repository) {
         HttpServerRepositoryValidator validator = HttpServerRepositoryValidator.fromRepository(repository);
         if (!validator.isHttpServer()) {
@@ -167,6 +242,12 @@ public class HttpServer {
         }
     }
 
+    /**
+     * Преобразование обработчика репозитория в слушателя HTTP.
+     *
+     * @param repositoryHandler Обработчик репозитория.
+     * @return Слушатель HTTP.
+     */
     private HttpListener toHttpListener(HttpRepositoryHandler repositoryHandler) {
         return (request) -> {
             if (repositoryHandler.canProcess(request)) {
@@ -177,6 +258,11 @@ public class HttpServer {
         };
     }
 
+    /**
+     * Регистрация обработчика репозитория.
+     *
+     * @param repositoryHandler Обработчик репозитория.
+     */
     private void registerHandler(HttpRepositoryHandler repositoryHandler) {
         HttpListener httpListener = toHttpListener(repositoryHandler);
         String uri = repositoryHandler.getUri();
@@ -188,6 +274,11 @@ public class HttpServer {
         }
     }
 
+    /**
+     * Регистрация обработчика репозитория, выполняемого перед основными обработчиками.
+     *
+     * @param repositoryHandler Обработчик репозитория.
+     */
     private void registerBeforeHandler(HttpRepositoryHandler repositoryHandler) {
         Consumer<HttpRequest> consumer = ((httpRequest) -> repositoryHandler.getInvocation().process(httpRequest));
         String uri = repositoryHandler.getUri();
@@ -199,6 +290,12 @@ public class HttpServer {
         }
     }
 
+    /**
+     * Обработка HTTP-запроса.
+     *
+     * @param httpRequest Запрос, который нужно обработать.
+     * @return Опциональный HTTP-ответ.
+     */
     private Optional<HttpResponse> processHttpRequest(HttpRequest httpRequest) {
         for (HttpResourceUnit beforeUnit : beforeResources.getAllResourcesUnits()) {
             if (!beforeUnit.isExpected("*") && !beforeUnit.isExpected(httpRequest.getUrl())) {
@@ -218,12 +315,19 @@ public class HttpServer {
         List<HttpResponse> responsesList = toResponsesList(httpRequest, resources.getAllResourcesUnits());
 
         if (responsesList.size() > 1) {
-            throw new HttpServerException("Http request " + httpRequest.getMethod().getName() + " " + httpRequest.getPath() + " was proceed more then 1 responses");
+            throw new HttpServerException("Http request " + httpRequest.getMethod() + " " + httpRequest.getPath() + " was proceed more then 1 responses");
         }
 
         return responsesList.stream().findFirst();
     }
 
+    /**
+     * Преобразование HTTP-запроса в список ответов.
+     *
+     * @param httpRequest Запрос, который нужно обработать.
+     * @param resourceUnits Список ресурсов для обработки.
+     * @return Список HTTP-ответов.
+     */
     private List<HttpResponse> toResponsesList(HttpRequest httpRequest, List<HttpResourceUnit> resourceUnits) {
         List<HttpResponse> responsesList = new ArrayList<>();
 
@@ -242,6 +346,13 @@ public class HttpServer {
         return responsesList;
     }
 
+    /**
+     * Обработка слушателя HTTP-запросов.
+     *
+     * @param httpRequest Запрос, который нужно обработать.
+     * @param listener    Слушатель HTTP.
+     * @return CompletableFuture с HTTP-ответом.
+     */
     private CompletableFuture<HttpResponse> processHttpListener(HttpRequest httpRequest, HttpListener listener) {
         if (asyncListeners.contains(listener)) {
             return CompletableFuture.supplyAsync(() -> listener.process(httpRequest),
