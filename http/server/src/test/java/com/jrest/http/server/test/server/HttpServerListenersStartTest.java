@@ -21,5 +21,6 @@ public class HttpServerListenersStartTest {
         });
 
         httpServer.bind();
+        System.out.println("HTTP Server started on port 8080");
     }
 }

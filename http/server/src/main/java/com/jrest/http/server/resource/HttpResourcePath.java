@@ -49,6 +49,9 @@ public class HttpResourcePath {
     //}
 
     boolean isExpected(String requestUri) {
+        if (requestUri.contains("?")) {
+            requestUri = requestUri.substring(0, requestUri.indexOf("?"));
+        }
         return requestUri.equalsIgnoreCase(full);
     }
 

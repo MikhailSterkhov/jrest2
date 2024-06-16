@@ -16,5 +16,7 @@ public class HttpServerRepositoryStartTest {
 
         httpServer.registerRepository(new HttpServerRepository());
         httpServer.bind();
+
+        System.out.println("HTTP Server started on port 8080");
     }
 }

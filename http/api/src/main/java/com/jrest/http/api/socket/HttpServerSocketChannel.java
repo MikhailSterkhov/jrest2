@@ -46,26 +46,27 @@ public class HttpServerSocketChannel {
         serverSocketChannel.socket().bind(new InetSocketAddress(config.getPort()));
         serverSocketChannel.configureBlocking(false);
 
-        System.out.println("HTTP Server started on port " + config.getPort());
-
-        while (true) {
-            SocketChannel socketChannel = serverSocketChannel.accept();
-            if (socketChannel != null) {
-                handleClient(socketChannel.socket());
+        executorService.submit(() -> {
+            while (true) {
+                SocketChannel socketChannel = serverSocketChannel.accept();
+                if (socketChannel != null) {
+                    handleClient(socketChannel.socket());
+                }
             }
-        }
+        });
     }
 
     private void startHttpsServer() throws IOException {
         SSLContext sslContext = createSSLContext();
         SSLServerSocketFactory sslServerSocketFactory = sslContext.getServerSocketFactory();
         SSLServerSocket sslServerSocket = (SSLServerSocket) sslServerSocketFactory.createServerSocket(config.getPort());
-        System.out.println("HTTPS Server started on port " + config.getPort());
 
-        while (true) {
-            SSLSocket sslSocket = (SSLSocket) sslServerSocket.accept();
-            handleClient(sslSocket);
-        }
+        executorService.submit(() -> {
+            while (true) {
+                SSLSocket sslSocket = (SSLSocket) sslServerSocket.accept();
+                handleClient(sslSocket);
+            }
+        });
     }
 
     private SSLContext createSSLContext() {
@@ -111,8 +112,6 @@ public class HttpServerSocketChannel {
                         break;
                     }
                 }
-
-                System.out.println(new String(byteArrayOutputStream.toByteArray()));
 
                 ByteArrayInputStream responseStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
                 HttpRequest request = codec.decode0(responseStream);

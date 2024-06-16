@@ -38,11 +38,14 @@ public class HttpServer {
     private HttpServerSocketChannel httpServerSocketChannel;
 
     private final SslContent sslContent;
+    private final HttpListener notFoundListener;
 
     @Builder
-    public HttpServer(InetSocketAddress socketAddress, ExecutorService executorService, HttpProtocol protocol, SslContent ssl) {
+    public HttpServer(InetSocketAddress socketAddress, ExecutorService executorService, HttpProtocol protocol,
+                      SslContent ssl, HttpListener notFoundListener) {
         this.socketAddress = socketAddress;
         this.sslContent = ssl;
+        this.notFoundListener = notFoundListener;
         this.executorService = Optional.ofNullable(executorService).orElseGet(Executors::newCachedThreadPool);
         this.protocol = Optional.ofNullable(protocol).orElse(HttpProtocol.HTTP_1_1);
     }
@@ -70,10 +73,16 @@ public class HttpServer {
                                 clientChannel.sendResponse(
                                         httpResponseOptional.get());
                             } else {
-                                clientChannel.sendResponse(HttpResponse.builder()
-                                        .protocol(protocol)
-                                        .code(ResponseCode.NOT_FOUND)
-                                        .build());
+                                HttpResponse httpResponse;
+                                if (notFoundListener != null) {
+                                    httpResponse = notFoundListener.process(request);
+                                } else {
+                                    httpResponse = HttpResponse.builder()
+                                            .protocol(protocol)
+                                            .code(ResponseCode.NOT_FOUND)
+                                            .build();
+                                }
+                                clientChannel.sendResponse(httpResponse);
                             }
                         } catch (IOException exception) {
                             throw new HttpServerException(exception);

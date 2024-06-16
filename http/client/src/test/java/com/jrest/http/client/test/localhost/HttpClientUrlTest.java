@@ -8,7 +8,7 @@ public class HttpClientUrlTest {
     public static void main(String[] args) {
         HttpClient httpClient = HttpClients.createClient();
 
-        httpClient.executeGet("http://localhost:8080/employee")
+        httpClient.executeGet("http://localhost:8080/employee?id=567")
                 .ifPresent(httpResponse -> {
 
                     System.out.println(httpResponse.getProtocol());
@@ -18,7 +18,7 @@ public class HttpClientUrlTest {
                     //  200 OK
 
                     System.out.println(httpResponse.getContent().getHyperText());
-                    // {"fact":"A cat usually has about 12 whiskers on each side of its face.","length":61}
+                    // {"id":567,"firstName":"Piter","lastName":"Harrison","jobInfo":{"company":"Microsoft Corporation","website":"https://www.microsoft.com/","profession":"Developer C#","salary":3500}}
                 });
     }
 }
