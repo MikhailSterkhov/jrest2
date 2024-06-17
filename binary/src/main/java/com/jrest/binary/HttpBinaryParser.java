@@ -1,13 +1,25 @@
 package com.jrest.binary;
 
+import com.jrest.binary.data.HttpClientProperties;
+import com.jrest.binary.data.HttpRequestProperties;
+
 import java.io.*;
 import java.util.*;
 
+/**
+ * Парсер для бинарных конфигураций HTTP клиента и запросов.
+ */
 final class HttpBinaryParser {
 
     private Properties globalProperties;
     private int indexOfLine;
 
+    /**
+     * Парсит конфигурацию клиента из предоставленного буферизированного ридера.
+     *
+     * @param reader {@link BufferedReader} для чтения конфигурации клиента
+     * @return {@link HttpClientProperties} содержащий конфигурацию клиента
+     */
     public HttpClientProperties parseClientConfig(BufferedReader reader) {
         globalProperties = new Properties();
         String line = "";
@@ -33,6 +45,12 @@ final class HttpBinaryParser {
         return new HttpClientProperties(globalProperties);
     }
 
+    /**
+     * Парсит конфигурации запросов из предоставленного буферизированного ридера.
+     *
+     * @param reader {@link BufferedReader} для чтения конфигураций запросов
+     * @return список {@link HttpRequestProperties} содержащих конфигурации запросов
+     */
     public List<HttpRequestProperties> parseRequestConfigs(BufferedReader reader) {
         List<HttpRequestProperties> requests = new ArrayList<>();
         String line = "";
@@ -91,6 +109,12 @@ final class HttpBinaryParser {
         return requests;
     }
 
+    /**
+     * Заменяет все вхождения плейсхолдеров в строке их значениями из глобальных свойств.
+     *
+     * @param value строка с плейсхолдерами
+     * @return строка с замененными плейсхолдерами
+     */
     private String replacePlaceholders(String value) {
         String res = value;
         for (Object key : globalProperties.keySet()) {
