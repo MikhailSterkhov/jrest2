@@ -19,6 +19,7 @@
         <module>http</module>
         <module>mvc</module>
         <module>binary</module>
+        <module>test</module>
     </modules>
 
     <distributionManagement>
