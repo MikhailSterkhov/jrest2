@@ -51,21 +51,21 @@ public class CompletedBinary {
 
         Properties clientProperties = client.getProperties();
         clientProperties.forEach((o, o2) ->
-                clientProperties.setProperty(replaceInput(inputProperties, o.toString()), replaceInput(inputProperties, o2.toString())));
+                clientProperties.setProperty(o.toString(), replaceInput(inputProperties, o2.toString())));
 
         requests.replaceAll(requestProperties -> {
             Properties attributesProperties = requestProperties.getAttributes();
             attributesProperties.forEach((o, o2) ->
-                    attributesProperties.setProperty(replaceInput(inputProperties, o.toString()), replaceInput(inputProperties, o2.toString())));
+                    attributesProperties.setProperty(o.toString(), replaceInput(inputProperties, o2.toString())));
 
             Properties bodyProperties = requestProperties.getBody();
             bodyProperties.forEach((o, o2) ->
-                    bodyProperties.setProperty(replaceInput(inputProperties, o.toString()), replaceInput(inputProperties, o2.toString())));
+                    bodyProperties.setProperty(o.toString(), replaceInput(inputProperties, o2.toString())));
 
             Map<String, List<String>> headers = requestProperties.getHeaders();
             new HashMap<>(headers).forEach((s, strings) -> {
                 strings.replaceAll(s1 -> replaceInput(inputProperties, s1));
-                headers.put(replaceInput(inputProperties, s), strings);
+                headers.put(s, strings);
             });
 
             return requestProperties;
