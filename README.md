@@ -49,7 +49,7 @@ repositories {
 ```
 
 ```groovy
-compileOnly 'com.github.MikhailSterkhov:jrest2:1.0'
+compileOnly 'com.github.MikhailSterkhov:jrest2:1.1'
 ```
 
 ---
