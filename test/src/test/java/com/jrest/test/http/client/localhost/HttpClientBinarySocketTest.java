@@ -13,19 +13,13 @@ public class HttpClientBinarySocketTest {
                 HttpClients.createSocketClient(),
                 HttpClientBinarySocketTest.class.getResourceAsStream("/employee.restbin"));
 
-        httpClient.executeBinary("post_employee",
-                        Attributes.newAttributes()
-                                .with("employee", Content.fromEntity(Employee.builder()
-                                                .id(1)
-                                                .firstName("Mikhail")
-                                                .lastName("Sterkhov")
-                                                .build())
-                                        .getText()))
+        Employee employee = Employee.builder().id(1).firstName("Mikhail").lastName("Sterkhov").build();
+        String employeeJson = Content.fromEntity(employee).getText();
+
+        httpClient.executeBinary("post_employee", Attributes.newAttributes().with("employee", employeeJson))
                 .ifPresent(System.out::println);
 
-        httpClient.executeBinary("get_employee",
-                        Attributes.newAttributes()
-                                .with("employee_id", 1))
+        httpClient.executeBinary("get_employee", Attributes.newAttributes().with("employee_id", 1))
                 .ifPresent(System.out::println);
     }
 }
