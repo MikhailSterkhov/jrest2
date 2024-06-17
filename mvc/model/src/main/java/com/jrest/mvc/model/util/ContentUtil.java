@@ -28,7 +28,7 @@ public class ContentUtil {
      * @param bytes массив байтов для преобразования
      * @return строка UTF-8, созданная из массива байтов
      */
-    public String toHyperText(byte[] bytes) {
+    public String toText(byte[] bytes) {
         return new String(bytes, StandardCharsets.UTF_8);
     }
 
@@ -106,7 +106,7 @@ public class ContentUtil {
         content.append(MULTIPART_SPLITERATOR);
 
         for (byte[] bytesPart : parts) {
-            content.append(toHyperText(bytesPart))
+            content.append(toText(bytesPart))
                     .append(MULTIPART_SPLITERATOR);
         }
 
@@ -124,7 +124,7 @@ public class ContentUtil {
         byte[][] result = new byte[bodies.length][];
 
         for (int i = 0; i < bodies.length; i++) {
-            result[i] = fromString(bodies[i].getHyperText());
+            result[i] = fromString(bodies[i].getText());
         }
 
         return result;

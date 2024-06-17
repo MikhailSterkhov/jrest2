@@ -4,6 +4,7 @@ import com.jrest.binary.data.CompletedBinary;
 import com.jrest.binary.data.HttpClientProperties;
 import com.jrest.binary.data.HttpRequestProperties;
 import com.jrest.mvc.model.*;
+import com.jrest.mvc.model.util.ContentUtil;
 import lombok.Builder;
 
 import java.util.Optional;
@@ -117,19 +118,21 @@ public class BinaryHttpClient extends AbstractHttpClient {
         Content.ContentBuilder contentBuilder = Content.builder();
         Properties bodyProperties = requestProperties.getBody();
 
-        String contentTypeString = bodyProperties.getProperty("type");
-        if (contentTypeString != null) {
-            contentBuilder.contentType(ContentType.fromString(contentTypeString));
-        }
-
-        String contentLengthString = bodyProperties.getProperty("length");
-        if (contentLengthString != null) {
-            contentBuilder.contentLength(Integer.parseInt(contentLengthString));
-        }
-
-        String contentTextString = bodyProperties.getProperty("content");
+        String contentTextString = bodyProperties.getProperty("text");
         if (contentTextString != null) {
-            contentBuilder.hyperText(contentTextString);
+            contentBuilder.text(contentTextString);
+
+            String contentTypeString = bodyProperties.getProperty("type");
+            if (contentTypeString != null) {
+                contentBuilder.contentType(ContentType.fromString(contentTypeString));
+            }
+
+            String contentLengthString = bodyProperties.getProperty("length");
+            if (contentLengthString != null) {
+                contentBuilder.contentLength(Integer.parseInt(contentLengthString));
+            } else {
+                contentBuilder.contentLength(ContentUtil.fromString(contentTextString).length);
+            }
         }
 
         return contentBuilder.build();

@@ -37,7 +37,7 @@ public class URLClientRequest extends AbstractClientHttpRequest {
 
     private HttpClientConnection prepare(HttpRequest httpRequest) {
         String outputString = Optional.ofNullable(httpRequest.getContent())
-                .map(Content::getHyperText)
+                .map(Content::getText)
                 .orElse(null);
 
         Map<String, List<String>> headersMap = Optional.ofNullable(httpRequest.getHeaders())

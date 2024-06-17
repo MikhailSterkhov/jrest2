@@ -20,7 +20,7 @@ public class HttpClientSocketTest {
                     System.out.println(httpResponse.getCode());
                     //  200 OK
 
-                    System.out.println(httpResponse.getContent().getHyperText());
+                    System.out.println(httpResponse.getContent().getText());
                     // {"fact":"A cat usually has about 12 whiskers on each side of its face.","length":61}
                 });
     }

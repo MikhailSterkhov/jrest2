@@ -18,7 +18,7 @@ public class HttpClientSocketTest {
                     System.out.println(httpResponse.getCode());
                     //  200 OK
 
-                    System.out.println(httpResponse.getContent().getHyperText());
+                    System.out.println(httpResponse.getContent().getText());
                     // {"id":567,"firstName":"Piter","lastName":"Harrison","jobInfo":{"company":"Microsoft Corporation","website":"https://www.microsoft.com/","profession":"Developer C#","salary":3500}}
                 });
     }

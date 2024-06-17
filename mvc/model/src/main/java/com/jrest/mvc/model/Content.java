@@ -25,7 +25,7 @@ public class Content {
      */
     public static Content from(ContentType contentType, byte[] array) {
         return Content.builder()
-                .hyperText(ContentUtil.toHyperText(array))
+                .text(ContentUtil.toText(array))
                 .contentType(contentType)
                 .contentLength(array.length)
                 .build();
@@ -39,8 +39,23 @@ public class Content {
      */
     public static Content fromText(String text) {
         return Content.builder()
-                .hyperText(text)
+                .text(text)
                 .contentType(ContentType.DEFAULT_TEXT)
+                .contentLength(ContentUtil.fromString(text).length)
+                .build();
+    }
+
+    /**
+     * Создает объект Content из указанного текста с типом по умолчанию "text/plain".
+     *
+     * @param contentType тип содержимого (например, "application/json", "text/plain").
+     * @param text текстовое содержимое.
+     * @return новый объект Content.
+     */
+    public static Content fromText(ContentType contentType, String text) {
+        return Content.builder()
+                .text(text)
+                .contentType(contentType)
                 .contentLength(ContentUtil.fromString(text).length)
                 .build();
     }
@@ -54,7 +69,7 @@ public class Content {
     public static Content fromEntity(Object entity) {
         byte[] bytes = ContentUtil.fromJsonEntity(entity);
         return Content.builder()
-                .hyperText(ContentUtil.toHyperText(bytes))
+                .text(ContentUtil.toText(bytes))
                 .contentType(ContentType.APPLICATION_JSON)
                 .contentLength(bytes.length)
                 .build();
@@ -142,7 +157,7 @@ public class Content {
 
     private final int contentLength;
     private final ContentType contentType;
-    private final String hyperText;
+    private final String text;
 
     /**
      * Преобразует текущий объект Content в экземпляр заданного класса с использованием
@@ -153,6 +168,6 @@ public class Content {
      * @return экземпляр объекта, десериализованного из текущего контента.
      */
     public <T> T toEntity(Class<T> entityClass) {
-        return ContentUtil.toJsonEntity(getHyperText(), entityClass);
+        return ContentUtil.toJsonEntity(getText(), entityClass);
     }
 }

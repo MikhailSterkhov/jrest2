@@ -2,7 +2,6 @@ package com.jrest.http.client.test.localhost;
 
 import com.jrest.http.client.HttpClient;
 import com.jrest.http.client.HttpClients;
-import com.jrest.mvc.model.Headers;
 
 public class HttpClientUrlTest {
 
@@ -19,7 +18,7 @@ public class HttpClientUrlTest {
                     System.out.println(httpResponse.getCode());
                     //  200 OK
 
-                    System.out.println(httpResponse.getContent().getHyperText());
+                    System.out.println(httpResponse.getContent().getText());
                     // {"id":567,"firstName":"Piter","lastName":"Harrison","jobInfo":{"company":"Microsoft Corporation","website":"https://www.microsoft.com/","profession":"Developer C#","salary":3500}}
                 });
     }
