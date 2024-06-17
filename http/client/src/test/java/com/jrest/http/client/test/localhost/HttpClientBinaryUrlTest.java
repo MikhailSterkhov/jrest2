@@ -9,7 +9,7 @@ public class HttpClientBinaryUrlTest {
     public static void main(String[] args) {
         BinaryHttpClient httpClient = HttpClients.binary(
                 HttpClients.createClient(),
-                HttpClientBinaryUrlTest.class.getResourceAsStream("/employee.jrest"));
+                HttpClientBinaryUrlTest.class.getResourceAsStream("/employee.restbin"));
 
         httpClient.executeBinary("getEmployee",
                         Attributes.newAttributes()

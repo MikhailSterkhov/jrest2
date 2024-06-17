@@ -182,7 +182,7 @@ The content of the function is divided into several keywords
 The values that come after the keyword are mostly 
 <br>in the Properties format.
 
-Example binary (`/catfacts.jrest`):
+Example binary (`/catfacts.restbin`):
 
 ```shell
 host = https://catfact.ninja/
@@ -216,7 +216,7 @@ Example (_Java Client_):
 ```java
 BinaryHttpClient httpClient = HttpClients.binary(
         HttpClients.createClient(),
-        getClass().getResourceAsStream("/catfacts.jrest"));
+        getClass().getResourceAsStream("/catfacts.restbin"));
 
 httpClient.executeBinary("getFact")
         .ifPresent(httpResponse -> {
@@ -259,7 +259,7 @@ Example (_Java Client_):
 ```java
 BinaryHttpClient httpClient = HttpClients.binary(
         HttpClients.createClient(),
-        HttpClientBinaryUrlTest.class.getResourceAsStream("/employee.jrest"));
+        HttpClientBinaryUrlTest.class.getResourceAsStream("/employee.restbin"));
 
 httpClient.executeBinary("getEmployee",
                 Attributes.newAttributes()

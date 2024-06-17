@@ -8,7 +8,7 @@ public class HttpClientBinaryUrlTest {
     public static void main(String[] args) {
         BinaryHttpClient httpClient = HttpClients.binary(
                 HttpClients.createClient(),
-                HttpClientBinaryUrlTest.class.getResourceAsStream("/catfacts.jrest"));
+                HttpClientBinaryUrlTest.class.getResourceAsStream("/catfacts.restbin"));
 
         httpClient.executeBinary("getFact")
                 .ifPresent(httpResponse -> {
