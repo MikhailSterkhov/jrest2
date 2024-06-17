@@ -4,7 +4,7 @@ import com.jrest.http.api.HttpListener;
 import com.jrest.http.server.resource.HttpServerResourceException;
 import com.jrest.mvc.model.HttpRequest;
 import com.jrest.mvc.model.HttpResponse;
-import com.jrest.mvc.persistence.util.HttpMvcMappersUtil;
+import com.jrest.mvc.persistence.HttpMvcMappersUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
