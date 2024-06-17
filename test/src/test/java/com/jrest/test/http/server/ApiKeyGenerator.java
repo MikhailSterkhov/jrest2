@@ -5,6 +5,6 @@ import com.jrest.http.server.apikey.AuthKeyGenerator;
 public class ApiKeyGenerator {
 
     public static void main(String[] args) {
-        System.out.println("Сгенерированный API-ключ: " + AuthKeyGenerator.defaults(20).generate());
+        System.out.println("Сгенерированный API-ключ: " + AuthKeyGenerator.defaults(30).generate());
     }
 }

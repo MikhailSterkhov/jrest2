@@ -46,7 +46,7 @@ public class Content {
     }
 
     /**
-     * Создает объект Content из указанного текста с типом по умолчанию "text/plain".
+     * Создает объект Content из указанного текста с типом
      *
      * @param contentType тип содержимого (например, "application/json", "text/plain").
      * @param text текстовое содержимое.
