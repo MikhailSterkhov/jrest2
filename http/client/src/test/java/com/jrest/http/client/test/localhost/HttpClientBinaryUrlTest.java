@@ -2,15 +2,18 @@ package com.jrest.http.client.test.localhost;
 
 import com.jrest.http.client.BinaryHttpClient;
 import com.jrest.http.client.HttpClients;
+import com.jrest.mvc.model.Attributes;
 
 public class HttpClientBinaryUrlTest {
 
     public static void main(String[] args) {
-        BinaryHttpClient httpClient = HttpClients.createBinaryClient(
+        BinaryHttpClient httpClient = HttpClients.binary(
                 HttpClients.createClient(),
                 HttpClientBinaryUrlTest.class.getResourceAsStream("/employee.jrest"));
 
-        httpClient.executeBinary("getEmployee")
+        httpClient.executeBinary("getEmployee",
+                        Attributes.newAttributes()
+                                .with("employee_id", 567))
                 .ifPresent(httpResponse -> {
 
                     System.out.println(httpResponse.getProtocol());

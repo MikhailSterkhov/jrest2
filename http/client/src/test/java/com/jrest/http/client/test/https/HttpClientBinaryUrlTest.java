@@ -1,13 +1,12 @@
 package com.jrest.http.client.test.https;
 
 import com.jrest.http.client.BinaryHttpClient;
-import com.jrest.http.client.HttpClient;
 import com.jrest.http.client.HttpClients;
 
 public class HttpClientBinaryUrlTest {
 
     public static void main(String[] args) {
-        BinaryHttpClient httpClient = HttpClients.createBinaryClient(
+        BinaryHttpClient httpClient = HttpClients.binary(
                 HttpClients.createClient(),
                 HttpClientBinaryUrlTest.class.getResourceAsStream("/catfacts.jrest"));
 

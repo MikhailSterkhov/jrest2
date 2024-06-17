@@ -1,8 +1,8 @@
 package com.jrest.http.client;
 
-import com.jrest.binary.CompletedBinary;
-import com.jrest.binary.HttpClientProperties;
-import com.jrest.binary.HttpRequestProperties;
+import com.jrest.binary.data.CompletedBinary;
+import com.jrest.binary.data.HttpClientProperties;
+import com.jrest.binary.data.HttpRequestProperties;
 import com.jrest.mvc.model.*;
 import lombok.Builder;
 
@@ -30,14 +30,29 @@ public class BinaryHttpClient extends AbstractHttpClient {
     }
 
     public Optional<HttpResponse> executeBinary(String name) {
-        return execute(buildHttpRequest(name));
+        return execute(buildHttpRequest(name, null));
     }
 
     public CompletableFuture<HttpResponse> executeBinaryAsync(String name) {
-        return executeAsync(buildHttpRequest(name));
+        return executeAsync(buildHttpRequest(name, null));
     }
 
-    private HttpRequest buildHttpRequest(String name) {
+    public Optional<HttpResponse> executeBinary(String name, Attributes input) {
+        Properties inputProperties = input.getProperties();
+        return execute(buildHttpRequest(name, inputProperties));
+    }
+
+    public CompletableFuture<HttpResponse> executeBinaryAsync(String name, Attributes input) {
+        Properties inputProperties = input.getProperties();
+        return executeAsync(buildHttpRequest(name, inputProperties));
+    }
+
+    private HttpRequest buildHttpRequest(String name, Properties inputProperties) {
+        CompletedBinary binary = this.binary;
+        if (inputProperties != null && !inputProperties.isEmpty()) {
+            binary = binary.copy(inputProperties);
+        }
+
         Optional<HttpRequestProperties> requestOptional = binary.findRequest(name);
         if (!requestOptional.isPresent()) {
             return null;

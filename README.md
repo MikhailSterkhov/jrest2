@@ -80,7 +80,7 @@ Also, this library implements the ability to apply and read SSL certificates
 
 Here are some examples of how to use the functionality of the top-level API to interact with the HTTP protocol
 
-### Clients
+### CLIENTS
 
 Let's start with the client part of the connection.
 
@@ -103,6 +103,12 @@ HttpClients.createClient(ExecutorService);
 HttpClients.createClient(ExecutorService, int connectTimeout);
 HttpClients.createClient(ExecutorService, int connectTimeout, int readTimeout);
 HttpClients.createClient();
+
+// variants of binary http-client wrappers implementation:
+HttpClients.binary(HttpClient httpClient, Reader reader);
+HttpClients.binary(HttpClient httpClient, InputStream inputStream);
+HttpClients.binary(HttpClient httpClient, File file) throws IOException;
+HttpClients.binary(HttpClient httpClient, Path path) throws IOException;
 ```
 
 Suppose we decide to implement a Socket connection with the ability 
@@ -146,7 +152,7 @@ The client API also implements one cool thing, thanks to which
 <br>you can simplify the implementation of HTTP requests as much 
 <br>as possible by writing just a few words in the code to do it!
 
-**HTTP BINARY FILES**
+### BINARY FILES
 
 Basic information you need to know when writing a binary:
 
@@ -208,7 +214,7 @@ BinaryHttpClient has 2 additional methods that distinguish
 Example (_Java Client_):
 
 ```java
-BinaryHttpClient httpClient = HttpClients.createBinaryClient(
+BinaryHttpClient httpClient = HttpClients.binary(
         HttpClients.createClient(),
         getClass().getResourceAsStream("/catfacts.jrest"));
 
@@ -229,7 +235,50 @@ httpClient.executeBinary("getFact")
         });
 ```
 
-### Servers
+And also for executing binary functions you can use input properties to 
+<br>customize the request from the outside.
+
+Here is an example.
+
+Example (_binary with inputs_):
+
+```shell
+host = http://localhost:8080/
+
+getEmployee: GET /employee {
+    attr id = ${input.employee_id}
+}
+```
+
+Here we can notice the `${input.employee_id}` property, we expect 
+<br>to get it from the client.
+<br>Below I will give an example of applying it to an executable file.
+
+Example (_Java Client_):
+
+```java
+BinaryHttpClient httpClient = HttpClients.binary(
+        HttpClients.createClient(),
+        HttpClientBinaryUrlTest.class.getResourceAsStream("/employee.jrest"));
+
+httpClient.executeBinary("getEmployee",
+                Attributes.newAttributes()
+                        .with("employee_id", 567))
+        .ifPresent(httpResponse -> {
+
+            System.out.println(httpResponse.getProtocol());
+            //  HTTP/1.1
+            System.out.println(httpResponse.getHeaders().getFirst(null));
+            // HTTP/1.1 200 OK
+            System.out.println(httpResponse.getCode());
+            //  200 OK
+
+            System.out.println(httpResponse.getContent().getHyperText());
+            // {"id":567,"firstName":"Piter","lastName":"Harrison","jobInfo":{"company":"Microsoft Corporation","website":"https://www.microsoft.com/","profession":"Developer C#","salary":3500}}
+        });
+```
+
+### SERVERS
 
 To create a server and initialize it, things are a bit more complicated, 
 <br>but only because it is a server, and it needs full business logic.
