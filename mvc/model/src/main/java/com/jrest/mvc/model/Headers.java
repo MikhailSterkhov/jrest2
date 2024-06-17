@@ -44,6 +44,9 @@ public class Headers {
      * @return текущий объект Headers.
      */
     public Headers add(String header, Object value) {
+        if (value == null) {
+            return this;
+        }
         List<String> strings = map.get(header);
         if (strings == null) {
             strings = new ArrayList<>();

@@ -1,5 +1,12 @@
 host = http://localhost:8080/
 
-getEmployee: GET /employee {
+get_employee: GET /employee {
     attr id = ${input.employee_id}
+}
+
+post_employee: POST /employee {
+    body {
+        type = application/json
+        text = ${input.employee}
+    }
 }

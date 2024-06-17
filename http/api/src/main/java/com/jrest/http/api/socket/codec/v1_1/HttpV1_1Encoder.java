@@ -32,7 +32,7 @@ public class HttpV1_1Encoder implements HttpEncoder {
 
         // Write body
         Content content = httpRequest.getContent();
-        if (content != null) {
+        if (content != null && !content.isEmpty()) {
             String contentText = content.getText();
 
             if (httpRequest.getHeaders().has(Headers.Def.TRANSFER_ENCODING, "chunked")) {
@@ -68,7 +68,7 @@ public class HttpV1_1Encoder implements HttpEncoder {
 
         // Write body
         Content content = httpResponse.getContent();
-        if (content != null) {
+        if (content != null && !content.isEmpty()) {
             String contentText = content.getText();
 
             if (httpResponse.getHeaders().has(Headers.Def.TRANSFER_ENCODING, "chunked")) {

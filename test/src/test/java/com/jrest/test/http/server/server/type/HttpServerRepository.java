@@ -40,4 +40,23 @@ public class HttpServerRepository {
                         .lastName("Harrison")
                         .build()));
     }
+
+    @HttpAsync
+    @HttpPost("/employee")
+    public HttpResponse doPost(HttpRequest request) {
+        System.out.println(request);
+        if (!request.getAttributes().getProperties().isEmpty()) {
+            return HttpResponse.badRequest();
+        }
+
+        Content content = request.getContent();
+        if (content.isEmpty()) {
+            return HttpResponse.noContent();
+        }
+
+        Employee employee = content.toEntity(Employee.class);
+        System.out.println("POST " + employee);
+
+        return HttpResponse.ok();
+    }
 }

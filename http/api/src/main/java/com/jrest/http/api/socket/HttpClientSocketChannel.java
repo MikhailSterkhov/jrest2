@@ -152,7 +152,7 @@ public class HttpClientSocketChannel {
         } catch (IOException e) {
             throw new HttpSocketException("I/O error: " + e.getMessage(), e);
         } catch (Throwable e) {
-            throw new HttpSocketException("Failed to read: uncorrected input data");
+            throw new HttpSocketException("Failed to read: uncorrected input data", e);
         } finally {
             if (!config.isKeepAlive()) {
                 socket.close();

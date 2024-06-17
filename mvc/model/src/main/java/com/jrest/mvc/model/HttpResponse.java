@@ -9,69 +9,57 @@ import lombok.*;
 @EqualsAndHashCode
 public class HttpResponse {
 
-    public static HttpResponse ok() {
+    public static HttpResponse of(ResponseCode responseCode) {
         return HttpResponse.builder()
-                .code(ResponseCode.OK)
+                .code(responseCode)
                 .build();
+    }
+
+    public static HttpResponse of(ResponseCode responseCode, Content content) {
+        return HttpResponse.builder()
+                .code(responseCode)
+                .content(content)
+                .build();
+    }
+
+    public static HttpResponse ok() {
+        return of(ResponseCode.OK);
     }
 
     public static HttpResponse ok(Content content) {
-        return HttpResponse.builder()
-                .code(ResponseCode.OK)
-                .content(content)
-                .build();
+        return of(ResponseCode.OK, content);
     }
 
     public static HttpResponse noContent() {
-        return HttpResponse.builder()
-                .code(ResponseCode.NO_CONTENT)
-                .build();
+        return of(ResponseCode.NO_CONTENT);
     }
 
     public static HttpResponse noContent(Content content) {
-        return HttpResponse.builder()
-                .code(ResponseCode.NO_CONTENT)
-                .content(content)
-                .build();
+        return of(ResponseCode.NO_CONTENT, content);
     }
 
     public static HttpResponse notFound() {
-        return HttpResponse.builder()
-                .code(ResponseCode.NOT_FOUND)
-                .build();
+        return of(ResponseCode.NOT_FOUND);
     }
 
     public static HttpResponse notFound(Content content) {
-        return HttpResponse.builder()
-                .code(ResponseCode.NOT_FOUND)
-                .content(content)
-                .build();
+        return of(ResponseCode.NOT_FOUND, content);
     }
 
     public static HttpResponse badRequest() {
-        return HttpResponse.builder()
-                .code(ResponseCode.BAD_REQUEST)
-                .build();
+        return of(ResponseCode.BAD_REQUEST);
     }
 
     public static HttpResponse badRequest(Content content) {
-        return HttpResponse.builder()
-                .code(ResponseCode.BAD_REQUEST)
-                .content(content)
-                .build();
+        return of(ResponseCode.BAD_REQUEST, content);
     }
 
     public static HttpResponse internalError() {
-        return HttpResponse.builder()
-                .code(ResponseCode.INTERNAL_ERROR)
-                .build();
+        return of(ResponseCode.INTERNAL_ERROR);
     }
 
     public static HttpResponse internalError(Content content) {
-        return HttpResponse.builder()
-                .code(ResponseCode.INTERNAL_ERROR)
-                .content(content)
-                .build();
+        return of(ResponseCode.INTERNAL_ERROR, content);
     }
 
     private HttpProtocol protocol;

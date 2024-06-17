@@ -160,6 +160,13 @@ public class Content {
     private final String text;
 
     /**
+     * Проверить, является ли тело запроса пустым
+     */
+    public boolean isEmpty() {
+        return text == null || text.isEmpty();
+    }
+
+    /**
      * Преобразует текущий объект Content в экземпляр заданного класса с использованием
      * метода десериализации JSON из строки.
      *

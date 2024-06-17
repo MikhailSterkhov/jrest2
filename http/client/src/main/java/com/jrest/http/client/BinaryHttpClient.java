@@ -125,6 +125,8 @@ public class BinaryHttpClient extends AbstractHttpClient {
             String contentTypeString = bodyProperties.getProperty("type");
             if (contentTypeString != null) {
                 contentBuilder.contentType(ContentType.fromString(contentTypeString));
+            } else {
+                contentBuilder.contentType(ContentType.DEFAULT_TEXT);
             }
 
             String contentLengthString = bodyProperties.getProperty("length");
