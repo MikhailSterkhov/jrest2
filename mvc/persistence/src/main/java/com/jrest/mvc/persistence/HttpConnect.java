@@ -1,10 +1,23 @@
 package com.jrest.mvc.persistence;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
+/**
+ * Аннотация для указания метода HTTP CONNECT.
+ * <p>
+ * Используется для обозначения методов, обрабатывающих HTTP CONNECT запросы.
+ * </p>
+ *
+ * <pre>
+ * {@code
+ * @HttpConnect("/connect-endpoint")
+ * public void connectMethod() {
+ *     // Логика обработки CONNECT запроса
+ * }
+ * }
+ * </pre>
+ */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface HttpConnect {

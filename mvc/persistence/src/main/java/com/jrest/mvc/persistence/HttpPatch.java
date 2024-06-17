@@ -1,10 +1,23 @@
 package com.jrest.mvc.persistence;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
+/**
+ * Аннотация для указания метода HTTP PATCH.
+ * <p>
+ * Используется для обозначения методов, обрабатывающих HTTP PATCH запросы.
+ * </p>
+ *
+ * <pre>
+ * {@code
+ * @HttpPatch("/patch-endpoint")
+ * public void patchMethod() {
+ *     // Логика обработки PATCH запроса
+ * }
+ * }
+ * </pre>
+ */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface HttpPatch {

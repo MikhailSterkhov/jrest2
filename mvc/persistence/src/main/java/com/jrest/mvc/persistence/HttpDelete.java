@@ -1,10 +1,23 @@
 package com.jrest.mvc.persistence;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
+/**
+ * Аннотация для указания метода HTTP DELETE.
+ * <p>
+ * Используется для обозначения методов, обрабатывающих HTTP DELETE запросы.
+ * </p>
+ *
+ * <pre>
+ * {@code
+ * @HttpDelete("/delete-endpoint")
+ * public void deleteMethod() {
+ *     // Логика обработки DELETE запроса
+ * }
+ * }
+ * </pre>
+ */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface HttpDelete {
