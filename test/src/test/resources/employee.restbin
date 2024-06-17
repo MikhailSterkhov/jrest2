@@ -6,7 +6,6 @@ get_employee: GET /employee {
 
 post_employee: POST /employee {
     body {
-        type = application/json
         text = ${input.employee}
     }
 }
