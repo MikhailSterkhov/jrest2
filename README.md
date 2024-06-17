@@ -5,7 +5,6 @@
 <br>
 
 <img src="https://img.shields.io/badge/language-Java-red?style=flat" />
-<img src="https://img.shields.io/badge/snapshot-1.2-green?style=flat" />
 <img src="https://img.shields.io/badge/release-1.1-gree?style=flat" />
 <img src="https://img.shields.io/badge/repository-jitpack.io-gold?style=flat" />
 <img src="https://img.shields.io/badge/build-maven-blue?style=flat" />
@@ -16,6 +15,8 @@
 
 ## Dependency
 
+[![](https://jitpack.io/v/MikhailSterkhov/jrest2.svg)](https://jitpack.io/#MikhailSterkhov/jrest2)
+
 > To use the data library in your project, you need to prescribe a dependency.
 > Below is an example of how to use the dependency for different build systems:
 
@@ -24,17 +25,19 @@
 Dependency block for Maven structure project:
 
 ```xml
-<repository>
-    <id>jitpack.io</id>
-    <url>https://jitpack.io</url>
-</repository>
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
 ```
 
 ```xml
 <dependency>
     <groupId>com.github.MikhailSterkhov</groupId>
     <artifactId>jrest2</artifactId>
-    <version>${jrest.release.version}</version>
+    <version>${jrest.version}</version>
 </dependency>
 ```
 
@@ -50,7 +53,7 @@ repositories {
 ```
 
 ```groovy
-compileOnly 'com.github.MikhailSterkhov:jrest2:${jrest.release.version}'
+compileOnly 'com.github.MikhailSterkhov:jrest2:${jrest.version}'
 ```
 
 ---
