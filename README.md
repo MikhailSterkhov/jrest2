@@ -33,7 +33,7 @@ Dependency block for Maven structure project:
 <dependency>
     <groupId>com.github.MikhailSterkhov</groupId>
     <artifactId>jrest2</artifactId>
-    <version>1.1</version>
+    <version>${jrest.release.version}</version>
 </dependency>
 ```
 
@@ -49,7 +49,7 @@ repositories {
 ```
 
 ```groovy
-compileOnly 'com.github.MikhailSterkhov:jrest2:1.1'
+compileOnly 'com.github.MikhailSterkhov:jrest2:${jrest.release.version}'
 ```
 
 ---

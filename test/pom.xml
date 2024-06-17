@@ -21,32 +21,32 @@
         <dependency>
             <groupId>com.jrest.framework</groupId>
             <artifactId>binary</artifactId>
-            <version>1.1</version>
+            <version>${jrest.release.version}</version>
         </dependency>
         <dependency>
             <groupId>com.jrest.framework</groupId>
             <artifactId>http-api</artifactId>
-            <version>1.1</version>
+            <version>${jrest.release.version}</version>
         </dependency>
         <dependency>
             <groupId>com.jrest.framework</groupId>
             <artifactId>http-client</artifactId>
-            <version>1.1</version>
+            <version>${jrest.release.version}</version>
         </dependency>
         <dependency>
             <groupId>com.jrest.framework</groupId>
             <artifactId>http-server</artifactId>
-            <version>1.1</version>
+            <version>${jrest.release.version}</version>
         </dependency>
         <dependency>
             <groupId>com.jrest.framework</groupId>
             <artifactId>persistence</artifactId>
-            <version>1.1</version>
+            <version>${jrest.release.version}</version>
         </dependency>
         <dependency>
             <groupId>com.jrest.framework</groupId>
             <artifactId>model</artifactId>
-            <version>1.1</version>
+            <version>${jrest.release.version}</version>
         </dependency>
     </dependencies>
 </project>
