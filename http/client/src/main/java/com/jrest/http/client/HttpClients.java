@@ -1,8 +1,13 @@
 package com.jrest.http.client;
 
+import com.jrest.binary.*;
 import com.jrest.mvc.model.HttpProtocol;
 import lombok.experimental.UtilityClass;
 
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -134,11 +139,69 @@ public class HttpClients {
     }
 
     /**
+     * Создает HTTP клиент на основе URL соединения с указанным исполнителем.
+     *
+     * @param executorService исполнитель для клиента
+     * @param connectTimeout  таймаут подключения к URL
+     * @return экземпляр HTTP клиента
+     */
+    public HttpClient createClient(ExecutorService executorService, int connectTimeout) {
+        return URLHttpClient.builder()
+                .connectTimeout(connectTimeout)
+                .executorService(executorService)
+                .build();
+    }
+
+    /**
+     * Создает HTTP клиент на основе URL соединения с указанным исполнителем.
+     *
+     * @param executorService исполнитель для клиента
+     * @param connectTimeout  таймаут подключения к URL
+     * @param readTimeout     таймаут чтения с потока соединения
+     * @return экземпляр HTTP клиента
+     */
+    public HttpClient createClient(ExecutorService executorService, int connectTimeout, int readTimeout) {
+        return URLHttpClient.builder()
+                .connectTimeout(connectTimeout)
+                .readTimeout(readTimeout)
+                .executorService(executorService)
+                .build();
+    }
+
+    /**
      * Создает HTTP клиент на основе URL соединения без указанного исполнителя.
      *
      * @return экземпляр HTTP клиента
      */
     public HttpClient createClient() {
         return createClient(null);
+    }
+
+    public BinaryHttpClient createBinaryClient(HttpClient httpClient, Reader reader) {
+        return BinaryHttpClient.builder()
+                .httpClient(httpClient)
+                .binary(HttpBinaryReader.read(reader))
+                .build();
+    }
+
+    public BinaryHttpClient createBinaryClient(HttpClient httpClient, InputStream inputStream) {
+        return BinaryHttpClient.builder()
+                .httpClient(httpClient)
+                .binary(HttpBinaryReader.read(inputStream))
+                .build();
+    }
+
+    public BinaryHttpClient createBinaryClient(HttpClient httpClient, File file) throws IOException {
+        return BinaryHttpClient.builder()
+                .httpClient(httpClient)
+                .binary(HttpBinaryReader.read(file))
+                .build();
+    }
+
+    public BinaryHttpClient createBinaryClient(HttpClient httpClient, Path path) throws IOException {
+        return BinaryHttpClient.builder()
+                .httpClient(httpClient)
+                .binary(HttpBinaryReader.read(path))
+                .build();
     }
 }

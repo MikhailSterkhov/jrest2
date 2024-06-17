@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.jrest.framework</groupId>
-        <artifactId>http</artifactId>
+        <artifactId>jrest2</artifactId>
         <version>1.1</version>
     </parent>
 
-    <artifactId>http-client</artifactId>
+    <artifactId>binary</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -20,12 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>com.jrest.framework</groupId>
-            <artifactId>http-api</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.jrest.framework</groupId>
-            <artifactId>binary</artifactId>
+            <artifactId>model</artifactId>
             <version>1.1</version>
         </dependency>
     </dependencies>

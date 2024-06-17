@@ -5,7 +5,7 @@
 <br>
 
 <img src="https://img.shields.io/badge/language-Java-red?style=flat" />
-<img src="https://img.shields.io/badge/release-1.0-gree?style=flat" />
+<img src="https://img.shields.io/badge/release-1.1-gree?style=flat" />
 <img src="https://img.shields.io/badge/repository-jitpack.io-gold?style=flat" />
 <img src="https://img.shields.io/badge/build-maven-blue?style=flat" />
 
@@ -33,7 +33,7 @@ Dependency block for Maven structure project:
 <dependency>
     <groupId>com.github.MikhailSterkhov</groupId>
     <artifactId>jrest2</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 </dependency>
 ```
 
@@ -100,6 +100,8 @@ HttpClients.createSocketClient(int connectTimeout, boolean keepAlive);
 
 // variants of HttpURLConnection implementation:
 HttpClients.createClient(ExecutorService);
+HttpClients.createClient(ExecutorService, int connectTimeout);
+HttpClients.createClient(ExecutorService, int connectTimeout, int readTimeout);
 HttpClients.createClient();
 ```
 
@@ -137,6 +139,93 @@ httpClient.executeGet("https://catfact.ninja/fact")
 
             System.out.println(httpResponse.getContent().getHyperText());
             // {"fact":"A cat usually has about 12 whiskers on each side of its face.","length":61}
+        });
+```
+
+The client API also implements one cool thing, thanks to which 
+<br>you can simplify the implementation of HTTP requests as much 
+<br>as possible by writing just a few words in the code to do it!
+
+**HTTP BINARY FILES**
+
+Basic information you need to know when writing a binary:
+
+The first lines are general Properties that can be applied in the queries themselves.
+The most important among them is the `host = ...` line.
+It is mandatory in application, and indicates the main address part of the URL that will be accessed.
+
+Next after Properties are the functions.
+Their structure is described by the following signature:
+
+```shell
+<name>: <METHOD> /<URI> {
+  ...
+}
+```
+
+The content of the function is divided into several keywords 
+<br>that can be used within the body of the function:
+
+- **head**: One of the headings of the query
+- **attr**: URI attributes that will be appended to the URL with a '?' (e.g. /employee?id=1, where 'id' is an attribute)
+- **body**: Request body
+- - **length**: The size of the body to be sent under the guise of the 'Content-Length' header
+- - **type**: The body type that will be sent under the 'Content-Type' header appearance
+- - **text**: Header content as Hyper text
+
+The values that come after the keyword are mostly 
+<br>in the Properties format.
+
+Example binary (`/catfacts.jrest`):
+
+```shell
+host = https://catfact.ninja/
+randomCatFact = A cat usually has about 12 whiskers on each side of its face.
+userAgent = JRest-Binary/1.1
+contentType = application/json
+
+getFact: GET /fact {
+    head User-Agent = ${userAgent}
+    head Accept = text/plain
+    attr length = 50
+}
+
+createFact: POST /fact {
+    head User-Agent = ${userAgent}
+    body {
+        type = ${contentType}
+        text = {"fact": "${randomCatFact}", "length": 61}
+    }
+}
+```
+
+After successfully writing our binary, we can start executing it by first creating a BinaryHttpClient 
+<br>via the factory: `HttpClients.createBinaryClient(HttpClient, <path-to-binary>)`
+
+BinaryHttpClient has 2 additional methods that distinguish 
+<br>it from other HTTP clients: `executeBinary(name)` and `executeBinaryAsync(name)`.
+
+Example (_Java Client_):
+
+```java
+BinaryHttpClient httpClient = HttpClients.createBinaryClient(
+        HttpClients.createClient(),
+        getClass().getResourceAsStream("/catfacts.jrest"));
+
+httpClient.executeBinary("getFact")
+        .ifPresent(httpResponse -> {
+
+                HttpProtocol protocol = response.getProtocol(); // HTTP/1.1
+                String statusLine = response.getHeaders().getFirst(null); // HTTP/1.1 200 OK
+
+                ResponseCode responseCode = response.getCode();
+            
+                if (!responseCode.isSuccessful()) {
+                    throw new RuntimeException("Content not found - " + responseCode);
+                }
+
+                System.out.println(httpResponse.getContent().getHyperText());
+                // {"fact":"A cat usually has about 12 whiskers on each side of its face.","length":61}
         });
 ```
 

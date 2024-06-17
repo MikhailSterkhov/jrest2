@@ -13,7 +13,7 @@ import java.io.File;
 @Getter
 @ToString
 @EqualsAndHashCode
-@Builder(access = AccessLevel.PRIVATE)
+@Builder
 public class Content {
 
     /**

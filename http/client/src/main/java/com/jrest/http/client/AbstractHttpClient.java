@@ -15,12 +15,18 @@ public abstract class AbstractHttpClient implements HttpClient {
 
     @Override
     public synchronized Optional<HttpResponse> execute(HttpRequest httpRequest) {
+        if (httpRequest == null) {
+            return Optional.empty();
+        }
         ClientHttpRequest clientHttpRequest = this.create(httpRequest);
         return clientHttpRequest.execute();
     }
 
     @Override
     public synchronized CompletableFuture<HttpResponse> executeAsync(HttpRequest httpRequest) {
+        if (httpRequest == null) {
+            return CompletableFuture.completedFuture(null);
+        }
         ClientHttpRequest clientHttpRequest = this.create(httpRequest);
         return clientHttpRequest.executeAsync();
     }

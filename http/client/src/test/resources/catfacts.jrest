@@ -1,0 +1,18 @@
+host = https://catfact.ninja/
+randomCatFact = A cat usually has about 12 whiskers on each side of its face.
+userAgent = JRest-Binary/1.1
+contentType = application/json
+
+getFact: GET /fact {
+    head User-Agent = ${userAgent}
+    head Accept = text/plain
+    attr length = 50
+}
+
+createFact: POST /fact {
+    head User-Agent = ${userAgent}
+    body {
+        type = ${contentType}
+        text = {"fact": "${randomCatFact}", "length": 61}
+    }
+}

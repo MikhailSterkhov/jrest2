@@ -15,9 +15,16 @@ public class URLClientRequest extends AbstractClientHttpRequest {
     private static final int CONNECT_TIMEOUT_DEF = 1000;
     private static final int READ_TIMEOUT_DEF = 3000;
 
+    private final Integer connectTimeout;
+    private final Integer readTimeout;
+
     @Builder
-    protected URLClientRequest(HttpRequest httpRequest, ExecutorService executorService) {
+    protected URLClientRequest(HttpRequest httpRequest, ExecutorService executorService,
+                               Integer connectTimeout, Integer readTimeout) {
+
         super(HttpProtocol.HTTP_1_1, httpRequest, executorService);
+        this.connectTimeout = connectTimeout;
+        this.readTimeout = readTimeout;
     }
 
     @Override
@@ -41,9 +48,9 @@ public class URLClientRequest extends AbstractClientHttpRequest {
                 .output(outputString)
                 .headers(headersMap)
                 .charset(StandardCharsets.UTF_8)
-                .connectTimeout(CONNECT_TIMEOUT_DEF)
-                .readTimeout(READ_TIMEOUT_DEF)
                 .method(httpRequest.getMethod().getName())
+                .connectTimeout(connectTimeout == null ? CONNECT_TIMEOUT_DEF : connectTimeout)
+                .readTimeout(readTimeout == null ? READ_TIMEOUT_DEF : readTimeout)
                 .build();
     }
 }

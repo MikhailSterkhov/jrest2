@@ -1,0 +1,6 @@
+host = http://localhost:8080/
+employee_id = 567
+
+getEmployee: GET /employee {
+    attr id = ${employee_id}
+}
