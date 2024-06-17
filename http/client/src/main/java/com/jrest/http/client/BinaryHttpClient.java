@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
- * Implementation of an HTTP client that uses binary configuration for requests.
+ * Реализация HTTP-клиента, использующего бинарные конфигурации для запросов.
  */
 public class BinaryHttpClient extends AbstractHttpClient {
 
@@ -32,31 +32,31 @@ public class BinaryHttpClient extends AbstractHttpClient {
     }
 
     /**
-     * Executes a binary HTTP request by name.
+     * Выполняет бинарный HTTP-запрос по имени.
      *
-     * @param name the name of the request configuration.
-     * @return an optional HttpResponse.
+     * @param name имя конфигурации запроса.
+     * @return опциональный HttpResponse.
      */
     public Optional<HttpResponse> executeBinary(String name) {
         return execute(buildHttpRequest(name, null));
     }
 
     /**
-     * Executes a binary HTTP request asynchronously by name.
+     * Асинхронно выполняет бинарный HTTP-запрос по имени.
      *
-     * @param name the name of the request configuration.
-     * @return a CompletableFuture of HttpResponse.
+     * @param name имя конфигурации запроса.
+     * @return CompletableFuture с HttpResponse.
      */
     public CompletableFuture<HttpResponse> executeBinaryAsync(String name) {
         return executeAsync(buildHttpRequest(name, null));
     }
 
     /**
-     * Executes a binary HTTP request by name with additional attributes.
+     * Выполняет бинарный HTTP-запрос по имени с дополнительными атрибутами.
      *
-     * @param name  the name of the request configuration.
-     * @param input the additional attributes to include in the request.
-     * @return an optional HttpResponse.
+     * @param name  имя конфигурации запроса.
+     * @param input дополнительные атрибуты для включения в запрос.
+     * @return опциональный HttpResponse.
      */
     public Optional<HttpResponse> executeBinary(String name, Attributes input) {
         Properties inputProperties = input.getProperties();
@@ -64,11 +64,11 @@ public class BinaryHttpClient extends AbstractHttpClient {
     }
 
     /**
-     * Executes a binary HTTP request asynchronously by name with additional attributes.
+     * Асинхронно выполняет бинарный HTTP-запрос по имени с дополнительными атрибутами.
      *
-     * @param name  the name of the request configuration.
-     * @param input the additional attributes to include in the request.
-     * @return a CompletableFuture of HttpResponse.
+     * @param name  имя конфигурации запроса.
+     * @param input дополнительные атрибуты для включения в запрос.
+     * @return CompletableFuture с HttpResponse.
      */
     public CompletableFuture<HttpResponse> executeBinaryAsync(String name, Attributes input) {
         Properties inputProperties = input.getProperties();
@@ -76,11 +76,11 @@ public class BinaryHttpClient extends AbstractHttpClient {
     }
 
     /**
-     * Builds an HttpRequest from the binary configuration.
+     * Создает HttpRequest из бинарной конфигурации.
      *
-     * @param name            the name of the request configuration.
-     * @param inputProperties additional properties to include in the request.
-     * @return the constructed HttpRequest.
+     * @param name            имя конфигурации запроса.
+     * @param inputProperties дополнительные свойства для включения в запрос.
+     * @return созданный HttpRequest.
      */
     private HttpRequest buildHttpRequest(String name, Properties inputProperties) {
         CompletedBinary binary = this.binary;
@@ -90,7 +90,7 @@ public class BinaryHttpClient extends AbstractHttpClient {
 
         Optional<HttpRequestProperties> requestOptional = binary.findRequest(name);
         if (!requestOptional.isPresent()) {
-            return null; // Consider throwing an exception or returning an Optional.
+            throw new HttpClientException("Unknown binary function `" + name + "`");
         }
 
         HttpRequestProperties requestProperties = requestOptional.get();
@@ -108,10 +108,10 @@ public class BinaryHttpClient extends AbstractHttpClient {
     }
 
     /**
-     * Builds the content for the HttpRequest.
+     * Создает контент для HttpRequest.
      *
-     * @param requestProperties the properties of the request.
-     * @return the constructed Content.
+     * @param requestProperties свойства запроса.
+     * @return созданный Content.
      */
     private Content buildContent(HttpRequestProperties requestProperties) {
         Content.ContentBuilder contentBuilder = Content.builder();
@@ -136,10 +136,10 @@ public class BinaryHttpClient extends AbstractHttpClient {
     }
 
     /**
-     * Builds the query string for the HttpRequest.
+     * Создает строку запроса для HttpRequest.
      *
-     * @param requestProperties the properties of the request.
-     * @return the constructed query string.
+     * @param requestProperties свойства запроса.
+     * @return созданная строка запроса.
      */
     private String buildQuery(HttpRequestProperties requestProperties) {
         Properties attributes = requestProperties.getAttributes();
