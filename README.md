@@ -576,7 +576,7 @@ public ApprovalResult approveAuth(UnapprovedRequest request) {
     HttpCredentials credentials = request.getRequestCredentials();
     Token token = credentials.getToken();
 
-    if (Objects.equals(GENERATED_API_TOKEN, token)) {
+    if (Objects.equals(token.getValue(), GENERATED_API_TOKEN)) {
         return ApprovalResult.approve();
     }
     
