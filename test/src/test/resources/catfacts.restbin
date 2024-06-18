@@ -1,4 +1,5 @@
 host = https://catfact.ninja/
+
 randomCatFact = A cat usually has about 12 whiskers on each side of its face.
 userAgent = JRest-Binary/1.1
 contentType = application/json

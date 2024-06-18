@@ -1,8 +1,8 @@
-package com.jrest.http.server.repository;
+package com.jrest.http.server.authentication;
 
 import com.jrest.mvc.model.HttpRestException;
 import lombok.experimental.StandardException;
 
 @StandardException
-public class HttpServerRepositoryException extends HttpRestException {
+public class HttpAuthorizationException extends HttpRestException {
 }

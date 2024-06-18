@@ -1,4 +1,4 @@
-package com.jrest.http.server.apikey;
+package com.jrest.http.server.authentication.token;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -10,11 +10,11 @@ import java.security.SecureRandom;
  * Генератор аутентификационных ключей (API ключей).
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class AuthKeyGenerator {
+public final class TokenGenerator {
 
     private static final SecureRandom secureRandom = new SecureRandom();
 
-    private final AuthKeyConfig config;
+    private final TokenConfig config;
 
     /**
      * Создает экземпляр генератора ключей с заданной конфигурацией.
@@ -22,8 +22,8 @@ public final class AuthKeyGenerator {
      * @param config конфигурация генератора ключей
      * @return экземпляр генератора ключей
      */
-    public static AuthKeyGenerator from(AuthKeyConfig config) {
-        return new AuthKeyGenerator(config);
+    public static TokenGenerator from(TokenConfig config) {
+        return new TokenGenerator(config);
     }
 
     /**
@@ -31,7 +31,7 @@ public final class AuthKeyGenerator {
      *
      * @return экземпляр генератора ключей
      */
-    public static AuthKeyGenerator defaults() {
+    public static TokenGenerator defaults() {
         return defaults(25);
     }
 
@@ -41,9 +41,9 @@ public final class AuthKeyGenerator {
      * @param length длина ключа
      * @return экземпляр генератора ключей
      */
-    public static AuthKeyGenerator defaults(int length) {
+    public static TokenGenerator defaults(int length) {
         return from(
-                AuthKeyConfig.builder()
+                TokenConfig.builder()
                         .radix(16)
                         .length(length)
                         .build());

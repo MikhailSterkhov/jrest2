@@ -1,8 +1,8 @@
 package com.jrest.binary;
 
 import com.jrest.binary.data.CompletedBinary;
-import com.jrest.binary.data.HttpClientProperties;
-import com.jrest.binary.data.HttpRequestProperties;
+import com.jrest.binary.data.BinaryGeneralProperties;
+import com.jrest.binary.data.BinaryRequest;
 import lombok.experimental.UtilityClass;
 
 import java.io.*;
@@ -26,8 +26,8 @@ public final class HttpBinaryReader {
         HttpBinaryParser httpBinaryParser = new HttpBinaryParser();
         BufferedReader bufferedReader = new BufferedReader(reader);
 
-        HttpClientProperties httpClientProperties = httpBinaryParser.parseClientConfig(bufferedReader);
-        List<HttpRequestProperties> httpRequestsProperties = httpBinaryParser.parseRequestConfigs(bufferedReader);
+        BinaryGeneralProperties httpClientProperties = httpBinaryParser.readGeneralProperties(bufferedReader);
+        List<BinaryRequest> httpRequestsProperties = httpBinaryParser.readRequestsList(bufferedReader);
 
         return new CompletedBinary(httpClientProperties, httpRequestsProperties);
     }

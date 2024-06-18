@@ -33,7 +33,6 @@ public class HttpClientConnection {
             writeBody(connection);
         }
 
-
         try {
             ResponseCode responseCode = ResponseCode.fromCode(connection.getResponseCode());
             String responseBody = !responseCode.isError() ? readBody(connection) : "";

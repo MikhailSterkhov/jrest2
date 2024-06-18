@@ -1,4 +1,4 @@
-package com.jrest.http.server.apikey;
+package com.jrest.http.server.authentication.token;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -9,7 +9,7 @@ import lombok.ToString;
 @Builder
 @ToString
 @EqualsAndHashCode
-public class AuthKeyConfig {
+public class TokenConfig {
 
     private final int length;
     private final int radix;

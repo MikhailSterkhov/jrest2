@@ -2,6 +2,8 @@ package com.jrest.test.http.client.localhost;
 
 import com.jrest.http.client.HttpClient;
 import com.jrest.http.client.HttpClients;
+import com.jrest.mvc.model.Headers;
+import com.jrest.mvc.model.authentication.Authentication;
 
 public class HttpClientSocketTest {
 

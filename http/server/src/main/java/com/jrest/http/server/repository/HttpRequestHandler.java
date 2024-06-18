@@ -14,11 +14,12 @@ import lombok.ToString;
 @Getter
 @Builder
 @ToString
-public class HttpRepositoryHandler {
+public class HttpRequestHandler {
 
     private final String uri;
     private final HttpMethod httpMethod;
     private final HttpListener invocation;
+    private final boolean notAuthorized;
     private final boolean isAsynchronous;
 
     /**

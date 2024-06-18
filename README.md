@@ -474,6 +474,8 @@ Now when we query the `http://localhost:8080/employee?id=567`
 
 ---
 
+### ADDITIONAL HTTP-SERVER FEATURES
+
 **But that's not all!**
 
 The HTTP server repository has several other features that add 
@@ -481,7 +483,7 @@ some flexibility and convenience in exceptional cases of library use.
 
 Let's go through some of them!
 
-<br>
+---
 
 **Annotation @HttpBeforeExecution**:
 
@@ -500,6 +502,8 @@ public void before(HttpRequest httpRequest) {
     );
 }
 ```
+
+---
 
 **Annotation @HttpAsync**:
 
@@ -522,6 +526,108 @@ public HttpResponse patchEmployee(HttpRequest request) {
     catch (EmployeeException exception) {
         return HttpResponse.internalError();
     }
+}
+```
+
+---
+
+**Annotation @HttpAuthenticator**:
+
+To verify requests via authorization, you can use a fully dedicated 
+<br>functionality for this purpose, which provides you with an entire 
+<br>model API to implement HTTP request authentication.
+
+For examples:
+
+**Basic**
+
+```java
+private static final Token.UsernameAndPassword APPROVAL_TOKEN =
+            Token.UsernameAndPassword.of("jrest_admin", "password");
+
+@HttpAuthenticator
+public ApprovalResult approveAuth(UnapprovedRequest request) {
+    return request.basicAuthenticate(APPROVAL_TOKEN);
+}
+```
+
+**Bearer**
+
+```java
+private static final String GENERATED_API_TOKEN = TokenGenerator.defaults(30).generate();
+
+@HttpAuthenticator
+public ApprovalResult approveAuth(UnapprovedRequest request) {
+    return request.bearerAuthenticate(GENERATED_API_TOKEN);
+}
+```
+
+**Bearer** (custom)
+
+```java
+private static final String GENERATED_API_TOKEN = TokenGenerator.defaults(30).generate();
+
+@HttpAuthenticator
+public ApprovalResult approveAuth(UnapprovedRequest request) {
+    if (request.getAuthentication() != Authentication.BEARER) {
+        return ApprovalResult.forbidden();
+    }
+
+    HttpCredentials credentials = request.getRequestCredentials();
+    Token token = credentials.getToken();
+
+    if (Objects.equals(GENERATED_API_TOKEN, token)) {
+        return ApprovalResult.approve();
+    }
+    
+    return ApprovalResult.forbidden();
+}
+```
+
+In case you want to apply authorization 
+<br>**without using classes with the @HttpServer annotation**, 
+<br>there are ways to do it too, let's look at a few of them:
+
+```java
+HttpServer httpServer = ...;
+Token.UsernameAndPassword credentials = Token.UsernameAndPassword.of("jrest_admin", "password")
+httpServer.addAuthenticator(HttpBasicAuthenticator.of(credentials));
+```
+
+```java
+HttpServer httpServer = ...;
+httpServer.addAuthenticator(HttpBearerAuthenticator.of(
+        Arrays.asList(
+                "c9636ffe984e41d7b03c1b42d72402210aa9e64f2bedd6064a70416ba5e",
+                "f9af04c492c35e468100f9eead215903a67cdc3168fd95d78ca9bd4f9173",
+                "fe332dc685090ddbbf1a7569f22ac2bbe0f13644dbcd3f77cbeaf8f86c47"));
+```
+
+```java
+HttpServer httpServer = ...;
+httpServer.addAuthenticator(HttpBearerAuthenticator.single(
+        "c9636ffe984e41d7b03c1b42d72402210aa9e64f2bedd6064a70416ba5e"));
+```
+
+```java
+HttpServer httpServer = ...;
+httpServer.addAuthenticator(Authentication.DIGEST, (unapprovedRequest) -> { return ApprovalResult.forbidden(); });
+```
+
+---
+
+**Annotation @HttpNotAuthorized**:
+
+With this annotation, you can mark methods with HTTP requests 
+<br>to be excluded from the request authentication process.
+
+Example:
+
+```java
+@HttpNotAuthorized
+@HttpGet("/employee")
+public HttpResponse doGet(HttpRequest request) {
+    // request handle logic...
 }
 ```
 

@@ -1,5 +1,6 @@
-package com.jrest.http.client;
+package com.jrest.http.client.impl;
 
+import com.jrest.http.client.ClientHttpRequest;
 import com.jrest.http.client.request.SocketClientRequest;
 import com.jrest.mvc.model.HttpProtocol;
 import com.jrest.mvc.model.HttpRequest;

@@ -1,5 +1,7 @@
-package com.jrest.http.client;
+package com.jrest.http.client.impl;
 
+import com.jrest.http.client.ClientHttpRequest;
+import com.jrest.http.client.HttpClient;
 import com.jrest.mvc.model.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

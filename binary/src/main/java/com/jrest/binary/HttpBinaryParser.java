@@ -1,7 +1,7 @@
 package com.jrest.binary;
 
-import com.jrest.binary.data.HttpClientProperties;
-import com.jrest.binary.data.HttpRequestProperties;
+import com.jrest.binary.data.BinaryGeneralProperties;
+import com.jrest.binary.data.BinaryRequest;
 
 import java.io.*;
 import java.util.*;
@@ -18,9 +18,9 @@ final class HttpBinaryParser {
      * Парсит конфигурацию клиента из предоставленного буферизированного ридера.
      *
      * @param reader {@link BufferedReader} для чтения конфигурации клиента
-     * @return {@link HttpClientProperties} содержащий конфигурацию клиента
+     * @return {@link BinaryGeneralProperties} содержащий конфигурацию клиента
      */
-    public HttpClientProperties parseClientConfig(BufferedReader reader) {
+    public BinaryGeneralProperties readGeneralProperties(BufferedReader reader) {
         globalProperties = new Properties();
         String line = "";
 
@@ -42,17 +42,17 @@ final class HttpBinaryParser {
             throw new JrestBinaryException("Error on " + (indexOfLine - 1) + " line: " + line, ex);
         }
 
-        return new HttpClientProperties(globalProperties);
+        return new BinaryGeneralProperties(globalProperties);
     }
 
     /**
      * Парсит конфигурации запросов из предоставленного буферизированного ридера.
      *
      * @param reader {@link BufferedReader} для чтения конфигураций запросов
-     * @return список {@link HttpRequestProperties} содержащих конфигурации запросов
+     * @return список {@link BinaryRequest} содержащих конфигурации запросов
      */
-    public List<HttpRequestProperties> parseRequestConfigs(BufferedReader reader) {
-        List<HttpRequestProperties> requests = new ArrayList<>();
+    public List<BinaryRequest> readRequestsList(BufferedReader reader) {
+        List<BinaryRequest> requests = new ArrayList<>();
         String line = "";
         try {
             while ((line = reader.readLine()) != null) {
@@ -100,7 +100,7 @@ final class HttpBinaryParser {
                     indexOfLine++;
                 }
 
-                requests.add(new HttpRequestProperties(name, method, uri.substring(0, uri.length() - 2), headers, attributes, body));
+                requests.add(new BinaryRequest(name, method, uri.substring(0, uri.length() - 2), headers, attributes, body));
             }
         } catch (Throwable ex) {
             throw new JrestBinaryException("Error on " + indexOfLine + " line: " + line, ex);

@@ -24,6 +24,4 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface HttpAuthenticator {
-
-    String header() default Headers.Def.AUTHORIZATION;
 }

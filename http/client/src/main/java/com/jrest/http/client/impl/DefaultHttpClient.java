@@ -1,18 +1,19 @@
-package com.jrest.http.client;
+package com.jrest.http.client.impl;
 
+import com.jrest.http.client.ClientHttpRequest;
 import com.jrest.http.client.request.URLClientRequest;
 import com.jrest.mvc.model.HttpRequest;
 import lombok.Builder;
 
 import java.util.concurrent.ExecutorService;
 
-public class URLHttpClient extends AbstractHttpClient {
+public class DefaultHttpClient extends AbstractHttpClient {
 
     private final Integer connectTimeout;
     private final Integer readTimeout;
 
     @Builder
-    protected URLHttpClient(ExecutorService executorService, Integer connectTimeout, Integer readTimeout) {
+    protected DefaultHttpClient(ExecutorService executorService, Integer connectTimeout, Integer readTimeout) {
         super(executorService);
         this.connectTimeout = connectTimeout;
         this.readTimeout = readTimeout;

@@ -1,7 +1,7 @@
-package com.jrest.test.http.server.server;
+package com.jrest.test.http.server;
 
 import com.jrest.http.server.HttpServer;
-import com.jrest.test.http.server.server.type.HttpServerRepository;
+import com.jrest.test.http.server.type.HttpServerRepository;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;

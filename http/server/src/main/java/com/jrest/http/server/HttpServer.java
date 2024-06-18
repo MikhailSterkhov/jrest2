@@ -3,13 +3,19 @@ package com.jrest.http.server;
 import com.jrest.http.api.HttpListener;
 import com.jrest.http.api.socket.HttpServerSocketChannel;
 import com.jrest.http.api.socket.HttpServerSocketConfig;
-import com.jrest.http.server.repository.HttpRepositoryHandler;
-import com.jrest.http.server.repository.HttpServerRepositoryException;
-import com.jrest.http.server.repository.HttpServerRepositoryValidator;
+import com.jrest.http.server.authentication.AuthorizationController;
+import com.jrest.http.server.authentication.AuthenticatorContainer;
+import com.jrest.http.server.authentication.AuthenticationTypes;
+import com.jrest.http.server.repository.HttpAuthorizationHandler;
+import com.jrest.http.server.repository.HttpRequestHandler;
+import com.jrest.http.server.repository.HttpRepositoryHelper;
 import com.jrest.http.server.resource.HttpResourcePath;
 import com.jrest.http.server.resource.HttpResourceUnit;
 import com.jrest.http.server.resource.HttpServerResources;
 import com.jrest.mvc.model.*;
+import com.jrest.mvc.model.authentication.ApprovalResult;
+import com.jrest.mvc.model.authentication.Authentication;
+import com.jrest.mvc.model.authentication.HttpAuthenticator;
 import lombok.Builder;
 
 import java.io.IOException;
@@ -30,6 +36,9 @@ public class HttpServer {
 
     private final InetSocketAddress socketAddress;
     private final ExecutorService executorService;
+
+    private final AuthorizationController authorizationController = new AuthorizationController();
+    private final AuthenticatorContainer authenticatorContainer = new AuthenticatorContainer();
 
     private final HttpServerResources resources = HttpServerResources.create();
     private final HttpServerResources beforeResources = HttpServerResources.create();
@@ -125,6 +134,26 @@ public class HttpServer {
         httpServerSocketChannel.shutdown();
     }
 
+    public void addAuthenticator(Authentication authentication, HttpAuthenticator authenticator) {
+        authenticatorContainer.add(authentication, authenticator);
+    }
+
+    public void setAuthenticator(Authentication authentication, HttpAuthenticator authenticator) {
+        authenticatorContainer.set(authentication, authenticator);
+    }
+
+    public void addAuthenticator(HttpAuthenticator authenticator) {
+        for (Authentication authentication : AuthenticationTypes.values()) {
+            addAuthenticator(authentication, authenticator);
+        }
+    }
+
+    public void setAuthenticator(HttpAuthenticator authenticator) {
+        for (Authentication authentication : AuthenticationTypes.values()) {
+            setAuthenticator(authentication, authenticator);
+        }
+    }
+
     /**
      * Регистрация синхронного слушателя, который выполняется перед основными обработчиками.
      *
@@ -135,10 +164,8 @@ public class HttpServer {
         beforeResources.register(
                 HttpResourceUnit.builder()
                         .path(HttpResourcePath.fromUri(uri))
-                        .listener((httpRequest -> {
-                            listener.accept(httpRequest);
-                            return HttpListener.SKIP_ACTION;
-                        }))
+                        .listener(wrapHttpListenerWithAuthorization(
+                                httpRequest -> { listener.accept(httpRequest); return HttpListener.SKIP_ACTION; }))
                         .build());
     }
 
@@ -149,14 +176,11 @@ public class HttpServer {
      * @param listener Слушатель, который будет обрабатывать запрос.
      */
     public void registerAsyncBeforeListener(String uri, Consumer<HttpRequest> listener) {
-        HttpListener httpListener = (httpRequest -> {
-            listener.accept(httpRequest);
-            return HttpListener.SKIP_ACTION;
-        });
+        HttpListener httpListener = (httpRequest) -> { listener.accept(httpRequest); return HttpListener.SKIP_ACTION; };
         beforeResources.register(
                 HttpResourceUnit.builder()
                         .path(HttpResourcePath.fromUri(uri))
-                        .listener(httpListener)
+                        .listener(wrapHttpListenerWithAuthorization(httpListener))
                         .build());
         asyncBeforeListeners.add(httpListener);
     }
@@ -171,7 +195,7 @@ public class HttpServer {
         resources.register(
                 HttpResourceUnit.builder()
                         .path(HttpResourcePath.fromUri(uri))
-                        .listener(listener)
+                        .listener(wrapHttpListenerWithAuthorization(listener))
                         .build());
     }
 
@@ -226,32 +250,85 @@ public class HttpServer {
      * Регистрация репозитория с обработчиками.
      *
      * @param repository Репозиторий, содержащий методы, аннотированные для обработки HTTP-запросов.
-     * @throws HttpServerRepositoryException если репозиторий не аннотирован как @HttpServer.
+     * @throws HttpServerException если репозиторий не аннотирован как @HttpServer.
      */
     public void registerRepository(Object repository) {
-        HttpServerRepositoryValidator validator = HttpServerRepositoryValidator.fromRepository(repository);
-        if (!validator.isHttpServer()) {
-            throw new HttpServerRepositoryException("Repository " + repository.getClass() + " is not annotated as @HttpServer");
+        HttpRepositoryHelper repositoryHelper = HttpRepositoryHelper.fromRepository(repository);
+        if (!repositoryHelper.isHttpServer()) {
+            throw new HttpServerException("Repository " + repository.getClass() + " is not annotated as @HttpServer");
         }
 
-        for (HttpRepositoryHandler repositoryHandler : validator.findProcessingHandlers()) {
+        List<HttpAuthorizationHandler> authorizationHandlers = repositoryHelper.findAuthorizationHandlers();
+
+        List<HttpRequestHandler> processingHandlers = repositoryHelper.findProcessingHandlers();
+        List<HttpRequestHandler> beforeHandlers = repositoryHelper.findBeforeHandlers();
+
+        for (Authentication authentication : AuthenticationTypes.values()) {
+            for (HttpAuthorizationHandler authorizationHandler : authorizationHandlers) {
+                addAuthenticator(authentication, wrapAuthenticatorWithAsync(authorizationHandler.isAsynchronous(),
+                        authorizationHandler.getAuthenticator()));
+            }
+        }
+        for (HttpRequestHandler repositoryHandler : processingHandlers) {
             registerHandler(repositoryHandler);
         }
-        for (HttpRepositoryHandler repositoryHandler : validator.findBeforeHandlers()) {
+        for (HttpRequestHandler repositoryHandler : beforeHandlers) {
             registerBeforeHandler(repositoryHandler);
         }
+    }
+
+    private HttpAuthenticator wrapAuthenticatorWithAsync(boolean isAsync, HttpAuthenticator httpAuthenticator) {
+        HttpAuthenticator authenticator = httpAuthenticator;
+        if (isAsync) {
+            authenticator = (unapprovedRequest) ->
+                    CompletableFuture.supplyAsync(() ->
+                            httpAuthenticator.authenticate(unapprovedRequest), executorService).join();
+        }
+        return authenticator;
+    }
+
+    private HttpListener wrapHttpListenerWithAuthorization(HttpListener httpListener) {
+        return (httpRequest) -> {
+            ApprovalResult result = authorize(httpRequest);
+            if (result.isForbidden()) {
+                return result.getForbiddenResponse();
+            }
+            return httpListener.process(httpRequest);
+        };
+    }
+
+    private ApprovalResult authorize(HttpRequest httpRequest) {
+        if (!authorizationController.hasAuthentication(httpRequest)) {
+            int authenticatorsCount = authenticatorContainer.getAllAuthenticators().size();
+            if (authenticatorsCount > 0) {
+                return ApprovalResult.forbidden();
+            } else {
+                return ApprovalResult.skip();
+            }
+        }
+        Authentication authentication = authorizationController.findAuthentication(httpRequest);
+        return authorizationController.authenticate(httpRequest, authentication,
+                authenticatorContainer.getAuthenticators(authentication));
     }
 
     /**
      * Преобразование обработчика репозитория в слушателя HTTP.
      *
-     * @param repositoryHandler Обработчик репозитория.
+     * @param requestHandler Обработчик репозитория.
      * @return Слушатель HTTP.
      */
-    private HttpListener toHttpListener(HttpRepositoryHandler repositoryHandler) {
+    private HttpListener toHttpListener(HttpRequestHandler requestHandler) {
         return (request) -> {
-            if (repositoryHandler.canProcess(request)) {
-                return repositoryHandler.getInvocation().process(request);
+            if (requestHandler.canProcess(request)) {
+                if (!requestHandler.isNotAuthorized()) {
+
+                    ApprovalResult result = authorize(request);
+                    if (result.isForbidden()) {
+                        return result.getForbiddenResponse();
+                    }
+                }
+                HttpListener httpListener = requestHandler.getInvocation();
+                return httpListener.process(request);
             }
 
             return HttpListener.SKIP_ACTION;
@@ -263,14 +340,18 @@ public class HttpServer {
      *
      * @param repositoryHandler Обработчик репозитория.
      */
-    private void registerHandler(HttpRepositoryHandler repositoryHandler) {
+    private void registerHandler(HttpRequestHandler repositoryHandler) {
         HttpListener httpListener = toHttpListener(repositoryHandler);
         String uri = repositoryHandler.getUri();
 
+        resources.register(
+                HttpResourceUnit.builder()
+                        .path(HttpResourcePath.fromUri(uri))
+                        .listener(httpListener)
+                        .build());
+
         if (repositoryHandler.isAsynchronous()) {
-            registerAsyncListener(uri, httpListener);
-        } else {
-            registerListener(uri, httpListener);
+            asyncListeners.add(httpListener);
         }
     }
 
@@ -279,7 +360,7 @@ public class HttpServer {
      *
      * @param repositoryHandler Обработчик репозитория.
      */
-    private void registerBeforeHandler(HttpRepositoryHandler repositoryHandler) {
+    private void registerBeforeHandler(HttpRequestHandler repositoryHandler) {
         Consumer<HttpRequest> consumer = ((httpRequest) -> repositoryHandler.getInvocation().process(httpRequest));
         String uri = repositoryHandler.getUri();
 

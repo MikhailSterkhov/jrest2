@@ -21,7 +21,7 @@ public class Headers {
      * @return новый объект Headers.
      */
     public static Headers newHeaders() {
-        return new Headers(new LinkedHashMap<>());
+        return new Headers(new LinkedHashMap<>(32));
     }
 
     /**

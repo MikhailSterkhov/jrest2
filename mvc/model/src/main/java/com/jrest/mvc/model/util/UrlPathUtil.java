@@ -32,6 +32,10 @@ public class UrlPathUtil {
         int hostFirstIndex = url.indexOf(PROTOCOL_DELIMITER);
         String hostWithUri = url.substring(hostFirstIndex + 3);
 
+        if (!hostWithUri.contains(PATH_DELIMITER)) {
+            return PATH_DELIMITER;
+        }
+
         return hostWithUri.substring(hostWithUri.indexOf(PATH_DELIMITER));
     }
 }

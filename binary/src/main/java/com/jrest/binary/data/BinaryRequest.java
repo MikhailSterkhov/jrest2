@@ -11,7 +11,7 @@ import java.util.Properties;
 @Getter
 @ToString
 @RequiredArgsConstructor
-public class HttpRequestProperties {
+public class BinaryRequest {
 
     private final String name;
     private final String method;

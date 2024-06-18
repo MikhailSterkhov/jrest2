@@ -17,23 +17,23 @@ public class CompletedBinary {
     /**
      * Свойства HTTP клиента.
      */
-    private final HttpClientProperties client;
+    private final BinaryGeneralProperties client;
 
     /**
      * Список свойств HTTP запросов.
      */
-    private final List<HttpRequestProperties> requests;
+    private final List<BinaryRequest> requests;
 
     /**
      * Ищет HTTP запрос по имени.
      *
      * @param name имя HTTP запроса
-     * @return {@code Optional} содержащий {@link HttpRequestProperties}, если запрос с заданным именем найден,
+     * @return {@code Optional} содержащий {@link BinaryRequest}, если запрос с заданным именем найден,
      * иначе пустой {@code Optional}
      */
-    public Optional<HttpRequestProperties> findRequest(String name) {
+    public Optional<BinaryRequest> findRequest(String name) {
         return requests.stream()
-                .filter(httpRequestProperties -> httpRequestProperties.getName().equals(name))
+                .filter(binaryRequest -> binaryRequest.getName().equals(name))
                 .findFirst();
     }
 
@@ -46,8 +46,8 @@ public class CompletedBinary {
      * @return скопированные бинарные данные
      */
     public CompletedBinary copy(Properties inputProperties) {
-        HttpClientProperties client = new HttpClientProperties(getClient().getProperties());
-        List<HttpRequestProperties> requests = new ArrayList<>(getRequests());
+        BinaryGeneralProperties client = new BinaryGeneralProperties(getClient().getProperties());
+        List<BinaryRequest> requests = new ArrayList<>(getRequests());
 
         Properties clientProperties = client.getProperties();
         clientProperties.forEach((o, o2) ->

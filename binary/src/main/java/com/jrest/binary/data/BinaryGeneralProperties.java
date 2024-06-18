@@ -14,7 +14,7 @@ import java.util.Properties;
 @Getter
 @ToString
 @RequiredArgsConstructor
-public class HttpClientProperties {
+public class BinaryGeneralProperties {
 
     /**
      * Ключи для доступа к основным свойствам HTTP клиента.

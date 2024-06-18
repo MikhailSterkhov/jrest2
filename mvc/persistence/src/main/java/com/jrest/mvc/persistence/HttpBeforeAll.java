@@ -11,7 +11,7 @@ import java.lang.annotation.*;
  *
  * <pre>
  * {@code
- * @HttpBeforeExecution(method = "POST", path = "/getuser")
+ * @HttpBeforeAll(method = "POST", path = "/getuser")
  * public void beforeExecution() {
  *     // Логика, выполняемая перед выполнением POST запроса на /getuser
  * }
@@ -21,7 +21,7 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface HttpBeforeExecution {
+public @interface HttpBeforeAll {
 
     String method() default "*";
 

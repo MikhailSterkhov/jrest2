@@ -41,6 +41,11 @@ public class CacheControl {
     public static final CacheControl PRIVATE = from("private");
 
     /**
+     * Директива Cache-Control: public.
+     */
+    public static final CacheControl PUBLIC = from("public");
+
+    /**
      * Создает экземпляр CacheControl с директивой max-age.
      *
      * @param maxAge максимальный возраст в секундах.

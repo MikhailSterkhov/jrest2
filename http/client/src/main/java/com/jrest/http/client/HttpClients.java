@@ -1,6 +1,9 @@
 package com.jrest.http.client;
 
 import com.jrest.binary.*;
+import com.jrest.http.client.impl.WrappedBinaryHttpClient;
+import com.jrest.http.client.impl.SocketHttpClient;
+import com.jrest.http.client.impl.DefaultHttpClient;
 import com.jrest.mvc.model.HttpProtocol;
 import lombok.experimental.UtilityClass;
 
@@ -131,7 +134,7 @@ public class HttpClients {
      * @return экземпляр HTTP клиента
      */
     public HttpClient createClient(ExecutorService executorService) {
-        return URLHttpClient.builder()
+        return DefaultHttpClient.builder()
                 .executorService(executorService)
                 .build();
     }
@@ -144,7 +147,7 @@ public class HttpClients {
      * @return экземпляр HTTP клиента
      */
     public HttpClient createClient(ExecutorService executorService, int connectTimeout) {
-        return URLHttpClient.builder()
+        return DefaultHttpClient.builder()
                 .connectTimeout(connectTimeout)
                 .executorService(executorService)
                 .build();
@@ -159,7 +162,7 @@ public class HttpClients {
      * @return экземпляр HTTP клиента
      */
     public HttpClient createClient(ExecutorService executorService, int connectTimeout, int readTimeout) {
-        return URLHttpClient.builder()
+        return DefaultHttpClient.builder()
                 .connectTimeout(connectTimeout)
                 .readTimeout(readTimeout)
                 .executorService(executorService)
@@ -183,7 +186,7 @@ public class HttpClients {
      * @return экземпляр {@link BinaryHttpClient}
      */
     public BinaryHttpClient binary(HttpClient httpClient, Reader reader) {
-        return BinaryHttpClient.builder()
+        return WrappedBinaryHttpClient.builder()
                 .httpClient(httpClient)
                 .binary(HttpBinaryReader.read(reader))
                 .build();
@@ -197,7 +200,7 @@ public class HttpClients {
      * @return экземпляр {@link BinaryHttpClient}
      */
     public BinaryHttpClient binary(HttpClient httpClient, InputStream inputStream) {
-        return BinaryHttpClient.builder()
+        return WrappedBinaryHttpClient.builder()
                 .httpClient(httpClient)
                 .binary(HttpBinaryReader.read(inputStream))
                 .build();
@@ -211,7 +214,7 @@ public class HttpClients {
      * @return экземпляр {@link BinaryHttpClient}
      */
     public BinaryHttpClient binary(HttpClient httpClient, File file) throws IOException {
-        return BinaryHttpClient.builder()
+        return WrappedBinaryHttpClient.builder()
                 .httpClient(httpClient)
                 .binary(HttpBinaryReader.read(file))
                 .build();
@@ -225,7 +228,7 @@ public class HttpClients {
      * @return экземпляр {@link BinaryHttpClient}
      */
     public BinaryHttpClient binary(HttpClient httpClient, Path path) throws IOException {
-        return BinaryHttpClient.builder()
+        return WrappedBinaryHttpClient.builder()
                 .httpClient(httpClient)
                 .binary(HttpBinaryReader.read(path))
                 .build();

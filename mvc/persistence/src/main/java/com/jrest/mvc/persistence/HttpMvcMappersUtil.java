@@ -21,7 +21,7 @@ public class HttpMvcMappersUtil {
 
     private static final List<Class<? extends Annotation>> MAPPERS_ANNOTATIONS =
             Arrays.asList(
-                    HttpBeforeExecution.class,
+                    HttpBeforeAll.class,
                     HttpRequestMapping.class,
 
                     // http methods wrappers.
@@ -49,6 +49,22 @@ public class HttpMvcMappersUtil {
     }
 
     /**
+     * Проверяет, аннотирован ли метод как выполняемый предварительную авторизацию.
+     *
+     * @param method метод для проверки
+     * @return {@code true}, если метод аннотирован как выполняемый предварительную авторизацию, иначе {@code false}
+     */
+    public boolean isAnnotatedAsAuthenticator(Method method) {
+        initMapsLazy();
+        return method.isAnnotationPresent(HttpAuthenticator.class);
+    }
+
+    public boolean isAnnotatedAsNotAuthorized(Method method) {
+        initMapsLazy();
+        return method.isAnnotationPresent(HttpNotAuthorized.class);
+    }
+
+    /**
      * Проверяет, аннотирован ли метод как выполняемый перед обработкой HTTP запроса.
      *
      * @param method метод для проверки
@@ -56,7 +72,7 @@ public class HttpMvcMappersUtil {
      */
     public boolean isAnnotatedAsBeforeExecution(Method method) {
         initMapsLazy();
-        return method.isAnnotationPresent(HttpBeforeExecution.class);
+        return method.isAnnotationPresent(HttpBeforeAll.class);
     }
 
     /**
@@ -142,7 +158,7 @@ public class HttpMvcMappersUtil {
     private void initMapsLazy() {
         if (HTTP_METHODS_BY_MAPPERS == null || HTTP_METHODS_BY_MAPPERS.isEmpty()) {
             HTTP_METHODS_BY_MAPPERS = new HashMap<>();
-            registerMethodGetter(HttpBeforeExecution.class, (a) -> HttpMethod.fromName(a.method()));
+            registerMethodGetter(HttpBeforeAll.class, (a) -> HttpMethod.fromName(a.method()));
             registerMethodGetter(HttpRequestMapping.class, (a) -> HttpMethod.fromName(a.method()));
             registerMethodGetter(HttpGet.class, (a) -> HttpMethod.GET);
             registerMethodGetter(HttpDelete.class, (a) -> HttpMethod.DELETE);
@@ -155,7 +171,7 @@ public class HttpMvcMappersUtil {
 
         if (URI_GETTERS_BY_MAPPERS == null || URI_GETTERS_BY_MAPPERS.isEmpty()) {
             URI_GETTERS_BY_MAPPERS = new HashMap<>();
-            registerUriGetter(HttpBeforeExecution.class, HttpBeforeExecution::path);
+            registerUriGetter(HttpBeforeAll.class, HttpBeforeAll::path);
             registerUriGetter(HttpRequestMapping.class, HttpRequestMapping::path);
             registerUriGetter(HttpGet.class, HttpGet::value);
             registerUriGetter(HttpDelete.class, HttpDelete::value);

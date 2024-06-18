@@ -1,5 +1,7 @@
-package com.jrest.test.http.server.server.type;
+package com.jrest.test.http.server.type;
 
+import com.jrest.mvc.model.authentication.*;
+import com.jrest.mvc.persistence.HttpAuthenticator;
 import com.jrest.test.http.server.employee.Employee;
 import com.jrest.test.http.server.employee.EmployeeJob;
 import com.jrest.mvc.model.*;
@@ -10,7 +12,15 @@ import java.util.Optional;
 @HttpServer
 public class HttpServerRepository {
 
-    @HttpBeforeExecution
+    private static final Token.UsernameAndPassword APPROVAL_TOKEN =
+            Token.UsernameAndPassword.of("jrest_admin", "password");
+
+    @HttpAuthenticator
+    public ApprovalResult approveAuth(UnapprovedRequest request) {
+        return request.basicAuthenticate(APPROVAL_TOKEN);
+    }
+
+    @HttpBeforeAll
     public void before(HttpRequest httpRequest) {
         Headers headers = httpRequest.getHeaders()
                 .set(Headers.Def.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -19,6 +29,7 @@ public class HttpServerRepository {
         httpRequest.setHeaders(headers);
     }
 
+    @HttpNotAuthorized
     @HttpGet("/employee")
     public HttpResponse doGet(HttpRequest request) {
         Attributes attributes = request.getAttributes();
