@@ -14,7 +14,7 @@ public class HttpClientBinarySocketTest {
                 HttpClientBinarySocketTest.class.getResourceAsStream("/employee.restbin"));
 
         Employee employee = Employee.builder().id(1).firstName("Mikhail").lastName("Sterkhov").build();
-        String employeeJson = Content.fromEntity(employee).getText();
+        String employeeJson = Content.fromEntityJson(employee).getText();
 
         httpClient.executeBinary("post_employee", Attributes.newAttributes().with("employee", employeeJson))
                 .ifPresent(System.out::println);

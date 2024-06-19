@@ -66,11 +66,26 @@ public class Content {
      * @param entity объект, который будет сериализован в JSON.
      * @return новый объект Content.
      */
-    public static Content fromEntity(Object entity) {
+    public static Content fromEntityJson(Object entity) {
         byte[] bytes = ContentUtil.fromJsonEntity(entity);
         return Content.builder()
                 .text(ContentUtil.toText(bytes))
                 .contentType(ContentType.APPLICATION_JSON)
+                .contentLength(bytes.length)
+                .build();
+    }
+
+    /**
+     * Создает объект Content из указанного объекта, сериализуя его в XML и используя тип "application/xml".
+     *
+     * @param entity объект, который будет сериализован в XML.
+     * @return новый объект Content.
+     */
+    public static Content fromEntityXml(Object entity) {
+        byte[] bytes = ContentUtil.fromXmlEntity(entity);
+        return Content.builder()
+                .text(ContentUtil.toText(bytes))
+                .contentType(ContentType.APPLICATION_XML)
                 .contentLength(bytes.length)
                 .build();
     }
@@ -174,7 +189,19 @@ public class Content {
      * @param <T>         тип объекта.
      * @return экземпляр объекта, десериализованного из текущего контента.
      */
-    public <T> T toEntity(Class<T> entityClass) {
+    public <T> T fromJson(Class<T> entityClass) {
         return ContentUtil.toJsonEntity(getText(), entityClass);
+    }
+
+    /**
+     * Преобразует текущий объект Content в экземпляр заданного класса с использованием
+     * метода десериализации XML из строки.
+     *
+     * @param entityClass класс объекта, в который требуется преобразовать текущий контент.
+     * @param <T>         тип объекта.
+     * @return экземпляр объекта, десериализованного из текущего контента.
+     */
+    public <T> T fromXml(Class<T> entityClass) {
+        return ContentUtil.toXmlEntity(getText(), entityClass);
     }
 }

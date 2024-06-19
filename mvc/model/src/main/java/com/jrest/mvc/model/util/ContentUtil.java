@@ -1,10 +1,12 @@
 package com.jrest.mvc.model.util;
 
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jrest.mvc.model.Content;
 import com.jrest.mvc.model.ContentDisposition;
 import com.jrest.mvc.model.ContentType;
+import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 
 import java.io.File;
@@ -17,6 +19,8 @@ import java.nio.charset.StandardCharsets;
 public class ContentUtil {
 
     private static final Gson GSON = new GsonBuilder().setLenient().create();
+
+    private static final XmlMapper XML_MAPPER = new XmlMapper();
 
     private static final String MULTIPART_BEGIN = "--===\r\n";
     private static final String MULTIPART_SPLITERATOR = "\r\n";
@@ -50,6 +54,17 @@ public class ContentUtil {
      */
     public byte[] fromJsonEntity(Object object) {
         return fromString(GSON.toJson(object));
+    }
+
+    /**
+     * Преобразует объект в массив байтов, содержащий его XML-представление.
+     *
+     * @param object объект для преобразования в JSON
+     * @return массив байтов, содержащий JSON-представление объекта
+     */
+    @SneakyThrows
+    public byte[] fromXmlEntity(Object object) {
+        return fromString(XML_MAPPER.writeValueAsString(object));
     }
 
     /**
@@ -140,5 +155,18 @@ public class ContentUtil {
      */
     public <T> T toJsonEntity(String hyperText, Class<T> entityClass) {
         return GSON.fromJson(hyperText, entityClass);
+    }
+
+    /**
+     * Преобразует строковое представление XML в объект заданного класса.
+     *
+     * @param hyperText   строковое представление XML для преобразования
+     * @param entityClass класс объекта, в который будет преобразован JSON
+     * @param <T>         тип объекта
+     * @return объект заданного класса, созданный из XM:-представления
+     */
+    @SneakyThrows
+    public <T> T toXmlEntity(String hyperText, Class<T> entityClass) {
+        return XML_MAPPER.readValue(hyperText, entityClass);
     }
 }
