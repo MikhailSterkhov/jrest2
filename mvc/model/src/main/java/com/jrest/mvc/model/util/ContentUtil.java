@@ -1,5 +1,6 @@
 package com.jrest.mvc.model.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -10,6 +11,7 @@ import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -62,7 +64,7 @@ public class ContentUtil {
      * @param object объект для преобразования в JSON
      * @return массив байтов, содержащий JSON-представление объекта
      */
-    @SneakyThrows
+    @SneakyThrows({JsonProcessingException.class})
     public byte[] fromXmlEntity(Object object) {
         return fromString(XML_MAPPER.writeValueAsString(object));
     }
@@ -165,7 +167,7 @@ public class ContentUtil {
      * @param <T>         тип объекта
      * @return объект заданного класса, созданный из XM:-представления
      */
-    @SneakyThrows
+    @SneakyThrows({IOException.class})
     public <T> T toXmlEntity(String hyperText, Class<T> entityClass) {
         return XML_MAPPER.readValue(hyperText, entityClass);
     }
