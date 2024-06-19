@@ -134,20 +134,42 @@ public class HttpServer {
         httpServerSocketChannel.shutdown();
     }
 
+    /**
+     * Добавление аутентификатора для конкретного типа аутентификации.
+     *
+     * @param authentication Тип аутентификации.
+     * @param authenticator  Аутентификатор.
+     */
     public void addAuthenticator(Authentication authentication, HttpAuthenticator authenticator) {
         authenticatorContainer.add(authentication, authenticator);
     }
 
+    /**
+     * Установка аутентификатора для конкретного типа аутентификации, заменяя существующий.
+     *
+     * @param authentication Тип аутентификации.
+     * @param authenticator  Аутентификатор.
+     */
     public void setAuthenticator(Authentication authentication, HttpAuthenticator authenticator) {
         authenticatorContainer.set(authentication, authenticator);
     }
 
+    /**
+     * Добавление аутентификатора для всех типов аутентификации.
+     *
+     * @param authenticator Аутентификатор.
+     */
     public void addAuthenticator(HttpAuthenticator authenticator) {
         for (Authentication authentication : AuthenticationTypes.values()) {
             addAuthenticator(authentication, authenticator);
         }
     }
 
+    /**
+     * Установка аутентификатора для всех типов аутентификации, заменяя существующие.
+     *
+     * @param authenticator Аутентификатор.
+     */
     public void setAuthenticator(HttpAuthenticator authenticator) {
         for (Authentication authentication : AuthenticationTypes.values()) {
             setAuthenticator(authentication, authenticator);
@@ -277,6 +299,13 @@ public class HttpServer {
         }
     }
 
+    /**
+     * Обертывание аутентификатора в асинхронный контекст при необходимости.
+     *
+     * @param isAsync         Флаг, указывающий, является ли аутентификатор асинхронным.
+     * @param httpAuthenticator Аутентификатор.
+     * @return Обернутый аутентификатор.
+     */
     private HttpAuthenticator wrapAuthenticatorWithAsync(boolean isAsync, HttpAuthenticator httpAuthenticator) {
         HttpAuthenticator authenticator = httpAuthenticator;
         if (isAsync) {
@@ -287,6 +316,12 @@ public class HttpServer {
         return authenticator;
     }
 
+    /**
+     * Обертывание HTTP-слушателя с авторизацией.
+     *
+     * @param httpListener HTTP-слушатель.
+     * @return Обернутый HTTP-слушатель.
+     */
     private HttpListener wrapHttpListenerWithAuthorization(HttpListener httpListener) {
         return (httpRequest) -> {
             ApprovalResult result = authorize(httpRequest);
@@ -297,6 +332,12 @@ public class HttpServer {
         };
     }
 
+    /**
+     * Авторизация HTTP-запроса.
+     *
+     * @param httpRequest HTTP-запрос.
+     * @return Результат авторизации.
+     */
     private ApprovalResult authorize(HttpRequest httpRequest) {
         if (!authorizationController.hasAuthentication(httpRequest)) {
             int authenticatorsCount = authenticatorContainer.getAllAuthenticators().size();

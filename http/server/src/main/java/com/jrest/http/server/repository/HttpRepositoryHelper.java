@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * Содержит методы для поиска и обработки аннотированных методов в репозитории.
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class HttpRepositoryHelper {
+public final class HttpRepositoryHelper {
 
     private final Object repository;
     private final Class<?> repositoryClass;
@@ -30,7 +30,7 @@ public class HttpRepositoryHelper {
      * Создает новый экземпляр помощника для указанного репозитория.
      *
      * @param object репозиторий
-     * @return экземпляр HttpServerRepositoryValidator
+     * @return экземпляр HttpRepositoryHelper
      */
     public static HttpRepositoryHelper fromRepository(Object object) {
         return new HttpRepositoryHelper(object, object.getClass());
@@ -45,6 +45,11 @@ public class HttpRepositoryHelper {
         return HttpMvcMappersUtil.isAnnotatedAsHttpServer(repositoryClass);
     }
 
+    /**
+     * Находит обработчики авторизации в репозитории.
+     *
+     * @return список обработчиков авторизации
+     */
     public List<HttpAuthorizationHandler> findAuthorizationHandlers() {
         return Arrays.stream(repositoryClass.getMethods())
                 .filter(HttpMvcMappersUtil::isAnnotatedAsAuthenticator)
@@ -76,6 +81,12 @@ public class HttpRepositoryHelper {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Преобразует метод репозитория в обработчик авторизации.
+     *
+     * @param method метод репозитория
+     * @return обработчик авторизации
+     */
     private HttpAuthorizationHandler toAuthorizationHandler(Method method) {
         method.setAccessible(true);
         return HttpAuthorizationHandler.builder()
@@ -125,6 +136,13 @@ public class HttpRepositoryHelper {
         }
     }
 
+    /**
+     * Выполняет вызов метода репозитория с заданным неутвержденным запросом.
+     *
+     * @param request неутвержденный запрос
+     * @param method метод репозитория
+     * @return результат авторизации
+     */
     private ApprovalResult invokeAuthorization(UnapprovedRequest request, Method method) {
         if (!method.getReturnType().equals(ApprovalResult.class)) {
             throw new HttpServerResourceException("Method `" + method + "` must return ApprovalResult type");
