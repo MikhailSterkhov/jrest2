@@ -171,26 +171,35 @@ public class HttpResponse {
     private Content content;
 
     /**
+     * Воспроизвести объединение заголовков ответов на HTTP-запросы
+     * @param otherHeaders - заголовки, которые объединяем с текущими.
+     * @return объединенный ответ.
+     */
+    public HttpResponse mergeHeaders(Headers otherHeaders) {
+        if (otherHeaders != null) {
+            if (headers == null) {
+                headers = Headers.newHeaders();
+            }
+            headers.getMap().putAll(otherHeaders.getMap());
+        }
+        return this;
+    }
+
+    /**
      * Воспроизвести объединение параметров их ответов на HTTP-запросы
      * @param other ответ на HTTP-запрос, который объединяем с текущим.
      * @return объединенный ответ.
      */
     public HttpResponse merge(HttpResponse other) {
-        if (other.headers != null) {
-            if (headers == null) {
-                headers = Headers.newHeaders();
-            }
-            headers.getMap().putAll(other.headers.getMap());
-        }
         if (other.code != null) {
             code = other.code;
         }
         if (other.protocol != null) {
             protocol = other.protocol;
         }
-        if (other.content != null) {
+        if (other.content != null && other.content.isValid()) {
             content = other.content;
         }
-        return this;
+        return mergeHeaders(other.headers);
     }
 }
