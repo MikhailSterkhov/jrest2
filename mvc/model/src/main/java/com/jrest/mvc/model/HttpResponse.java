@@ -169,4 +169,28 @@ public class HttpResponse {
 
     private Headers headers;
     private Content content;
+
+    /**
+     * Воспроизвести объединение параметров их ответов на HTTP-запросы
+     * @param other ответ на HTTP-запрос, который объединяем с текущим.
+     * @return объединенный ответ.
+     */
+    public HttpResponse merge(HttpResponse other) {
+        if (other.headers != null) {
+            if (headers == null) {
+                headers = Headers.newHeaders();
+            }
+            headers.getMap().putAll(other.headers.getMap());
+        }
+        if (other.code != null) {
+            code = other.code;
+        }
+        if (other.protocol != null) {
+            protocol = other.protocol;
+        }
+        if (other.content != null) {
+            content = other.content;
+        }
+        return this;
+    }
 }
