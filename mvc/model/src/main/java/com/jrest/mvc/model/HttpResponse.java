@@ -81,6 +81,32 @@ public class HttpResponse {
     }
 
     /**
+     * Создает новый HTTP ответ с кодом 301 Moved Permanently и указанным адресом.
+     *
+     * @param location адрес переадресации
+     * @return новый {@link HttpResponse} с кодом 301 Moved Permanently
+     */
+    public static HttpResponse redirectPerm(String location) {
+        return of(ResponseCode.MOVED_PERMANENTLY)
+                .toBuilder()
+                .headers(Headers.newHeaders().add(Headers.Def.LOCATION, location))
+                .build();
+    }
+
+    /**
+     * Создает новый HTTP ответ с кодом 302 Moved Temporary и указанным адресом.
+     *
+     * @param location адрес переадресации
+     * @return новый {@link HttpResponse} с кодом 302 Moved Temporary
+     */
+    public static HttpResponse redirectTemp(String location) {
+        return of(ResponseCode.MOVED_TEMPORARY)
+                .toBuilder()
+                .headers(Headers.newHeaders().add(Headers.Def.LOCATION, location))
+                .build();
+    }
+
+    /**
      * Создает новый HTTP ответ с кодом 404 Not Found.
      *
      * @return новый {@link HttpResponse} с кодом 404 Not Found

@@ -30,6 +30,12 @@ public class HttpServerRepository {
     }
 
     @HttpNotAuthorized
+    @HttpGet("/redirect")
+    public HttpResponse redirectToGoogle(HttpRequest httpRequest) {
+        return HttpResponse.redirectTemp("https://google.com/");
+    }
+
+    @HttpNotAuthorized
     @HttpGet("/employee")
     public HttpResponse doGet(HttpRequest request) {
         Attributes attributes = request.getAttributes();
