@@ -30,9 +30,9 @@ public class HttpServerRepository {
     }
 
     @HttpNotAuthorized
-    @HttpGet("/redirect")
-    public HttpResponse redirectToGoogle(HttpRequest httpRequest) {
-        return HttpResponse.redirectTemp("https://google.com/");
+    @HttpRequestMapping(path = "/redirect")
+    public HttpResponse moveToGoogle(HttpRequest httpRequest) {
+        return HttpResponse.movedTemporary("https://google.com/");
     }
 
     @HttpNotAuthorized

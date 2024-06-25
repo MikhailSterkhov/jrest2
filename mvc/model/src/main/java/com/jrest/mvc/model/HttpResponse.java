@@ -86,7 +86,7 @@ public class HttpResponse {
      * @param location адрес переадресации
      * @return новый {@link HttpResponse} с кодом 301 Moved Permanently
      */
-    public static HttpResponse redirectPerm(String location) {
+    public static HttpResponse movedPermanently(String location) {
         return of(ResponseCode.MOVED_PERMANENTLY)
                 .toBuilder()
                 .headers(Headers.newHeaders().add(Headers.Def.LOCATION, location))
@@ -99,7 +99,7 @@ public class HttpResponse {
      * @param location адрес переадресации
      * @return новый {@link HttpResponse} с кодом 302 Moved Temporary
      */
-    public static HttpResponse redirectTemp(String location) {
+    public static HttpResponse movedTemporary(String location) {
         return of(ResponseCode.MOVED_TEMPORARY)
                 .toBuilder()
                 .headers(Headers.newHeaders().add(Headers.Def.LOCATION, location))

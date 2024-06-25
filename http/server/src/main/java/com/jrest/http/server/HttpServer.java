@@ -420,7 +420,7 @@ public class HttpServer {
      */
     private Optional<HttpResponse> processHttpRequest(HttpRequest httpRequest) {
         for (HttpResourceUnit beforeUnit : beforeResources.getAllResourcesUnits()) {
-            if (!beforeUnit.isExpected("*") && !beforeUnit.isExpected(httpRequest.getUrl())) {
+            if (!beforeUnit.isExpected(httpRequest.getUrl())) {
                 continue;
             }
 
@@ -454,7 +454,7 @@ public class HttpServer {
         List<HttpResponse> responsesList = new ArrayList<>();
 
         for (HttpResourceUnit httpResourceUnit : resourceUnits) {
-            if (!httpResourceUnit.isExpected("*") && !httpResourceUnit.isExpected(httpRequest.getUrl())) {
+            if (!httpResourceUnit.isExpected(httpRequest.getUrl())) {
                 continue;
             }
 

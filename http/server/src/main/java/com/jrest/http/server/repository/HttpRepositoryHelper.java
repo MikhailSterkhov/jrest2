@@ -105,8 +105,8 @@ public final class HttpRepositoryHelper {
         method.setAccessible(true);
         return HttpRequestHandler.builder()
                 .uri(HttpMvcMappersUtil.findUri(method))
-                .httpMethod(HttpMvcMappersUtil.toHttpMethod(method))
-                .notAuthorized(HttpMvcMappersUtil.isAnnotatedAsNotAuthorized(method))
+                .method(HttpMvcMappersUtil.toHttpMethod(method))
+                .notAuthorized(HttpMvcMappersUtil.isAnnotatedAsBeforeExecution(method) || HttpMvcMappersUtil.isAnnotatedAsNotAuthorized(method))
                 .isAsynchronous(HttpMvcMappersUtil.isAnnotatedAsAsync(method))
                 .invocation(request -> invokeRequest(request, method))
                 .build();
