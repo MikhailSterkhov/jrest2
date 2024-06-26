@@ -22,10 +22,8 @@ public class HttpV1_1Encoder implements HttpEncoder {
 
             // Write headers
             for (Map.Entry<String, List<String>> header : httpRequest.getHeaders().getMap().entrySet()) {
-                for (String value : header.getValue()) {
-                    writer.write(header.getKey() + ": " + value);
-                    writer.newLine();
-                }
+                writer.write(header.getKey() + ": " + String.join(", ", header.getValue()));
+                writer.newLine();
             }
 
             writer.newLine();
@@ -62,10 +60,8 @@ public class HttpV1_1Encoder implements HttpEncoder {
 
             // Write headers
             for (Map.Entry<String, List<String>> header : httpResponse.getHeaders().getMap().entrySet()) {
-                for (String value : header.getValue()) {
-                    writer.write(header.getKey() + ": " + value);
-                    writer.newLine();
-                }
+                writer.write(header.getKey() + ": " + String.join(", ", header.getValue()));
+                writer.newLine();
             }
 
             writer.newLine();

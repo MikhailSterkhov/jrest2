@@ -29,6 +29,10 @@ public class HttpServerRepository {
         httpRequest.setHeaders(headers);
     }
 
+    public static void main(String[] args) {
+
+    }
+
     @HttpNotAuthorized
     @HttpRequestMapping(path = "/redirect")
     public HttpResponse moveToGoogle(HttpRequest httpRequest) {
