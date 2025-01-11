@@ -81,6 +81,32 @@ public class HttpResponse {
     }
 
     /**
+     * Создает новый HTTP ответ с кодом 301 Moved Permanently и указанным адресом.
+     *
+     * @param location адрес переадресации
+     * @return новый {@link HttpResponse} с кодом 301 Moved Permanently
+     */
+    public static HttpResponse movedPermanently(String location) {
+        return of(ResponseCode.MOVED_PERMANENTLY)
+                .toBuilder()
+                .headers(Headers.newHeaders().add(Headers.Def.LOCATION, location))
+                .build();
+    }
+
+    /**
+     * Создает новый HTTP ответ с кодом 302 Moved Temporary и указанным адресом.
+     *
+     * @param location адрес переадресации
+     * @return новый {@link HttpResponse} с кодом 302 Moved Temporary
+     */
+    public static HttpResponse movedTemporary(String location) {
+        return of(ResponseCode.MOVED_TEMPORARY)
+                .toBuilder()
+                .headers(Headers.newHeaders().add(Headers.Def.LOCATION, location))
+                .build();
+    }
+
+    /**
      * Создает новый HTTP ответ с кодом 404 Not Found.
      *
      * @return новый {@link HttpResponse} с кодом 404 Not Found
@@ -143,4 +169,37 @@ public class HttpResponse {
 
     private Headers headers;
     private Content content;
+
+    /**
+     * Воспроизвести объединение заголовков ответов на HTTP-запросы
+     * @param otherHeaders - заголовки, которые объединяем с текущими.
+     * @return объединенный ответ.
+     */
+    public HttpResponse mergeHeaders(Headers otherHeaders) {
+        if (otherHeaders != null) {
+            if (headers == null) {
+                headers = Headers.newHeaders();
+            }
+            headers.getMap().putAll(otherHeaders.getMap());
+        }
+        return this;
+    }
+
+    /**
+     * Воспроизвести объединение параметров их ответов на HTTP-запросы
+     * @param other ответ на HTTP-запрос, который объединяем с текущим.
+     * @return объединенный ответ.
+     */
+    public HttpResponse merge(HttpResponse other) {
+        if (other.code != null) {
+            code = other.code;
+        }
+        if (other.protocol != null) {
+            protocol = other.protocol;
+        }
+        if (other.content != null && other.content.isValid()) {
+            content = other.content;
+        }
+        return mergeHeaders(other.headers);
+    }
 }

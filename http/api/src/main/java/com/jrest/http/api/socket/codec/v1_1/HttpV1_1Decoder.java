@@ -1,8 +1,8 @@
 package com.jrest.http.api.socket.codec.v1_1;
 
+import com.jrest.http.api.socket.codec.HttpCodecException;
 import com.jrest.http.api.socket.codec.HttpDecoder;
 import com.jrest.mvc.model.*;
-import lombok.SneakyThrows;
 
 import java.io.*;
 import java.net.URLDecoder;
@@ -12,66 +12,74 @@ import java.util.stream.Collectors;
 
 public class HttpV1_1Decoder implements HttpDecoder {
 
-    @SneakyThrows
     @Override
     public HttpRequest decode0(InputStream inputStream) {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-        String line = reader.readLine();
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line = reader.readLine();
 
-        // Process the request line
-        String[] statusLineParts = line.split(" ");
-        HttpMethod method = HttpMethod.fromName(statusLineParts[0]);
-        String url = statusLineParts[1];
+            // Process the request line
+            String[] statusLineParts = line.split(" ");
+            HttpMethod method = HttpMethod.fromName(statusLineParts[0]);
+            String url = statusLineParts[1];
 
-        // Read headers
-        Headers headers = Headers.newHeaders();
-        while (!(line = reader.readLine()).isEmpty()) {
-            String[] headerParts = line.split(": ", 2);
-            headers.add(headerParts[0], headerParts[1]);
+            // Read headers
+            Headers headers = Headers.newHeaders();
+            while (!(line = reader.readLine()).isEmpty()) {
+                String[] headerParts = line.split(": ", 2);
+                headers.add(headerParts[0], headerParts[1]);
+            }
+
+            Attributes attributes = parseAttributes(url);
+            Content content = readContent(reader, headers);
+
+            return HttpRequest.builder()
+                    .method(method)
+                    .attributes(attributes)
+                    .url(url)
+                    .headers(headers)
+                    .content(content)
+                    .build();
+        } catch (Throwable ex) {
+            new HttpCodecException("failed request decode", ex).printStackTrace();
+            return null;
         }
-
-        Attributes attributes = parseAttributes(url);
-        Content content = readContent(reader, headers);
-
-        return HttpRequest.builder()
-                .method(method)
-                .attributes(attributes)
-                .url(url)
-                .headers(headers)
-                .content(content)
-                .build();
     }
 
-    @SneakyThrows
     @Override
     public HttpResponse decode1(InputStream inputStream) {
-        Headers headers = Headers.newHeaders();
+        try {
+            Headers headers = Headers.newHeaders();
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-        String line = reader.readLine();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line = reader.readLine();
 
-        headers.set(null, line);
+            headers.set(null, line);
 
-        // Process the status line
-        String[] statusLineParts = line.split(" ", 3);
-        HttpProtocol httpProtocol = HttpProtocol.read(statusLineParts[0]);
-        ResponseCode code = ResponseCode.fromCodeAndMessage(Integer.parseInt(statusLineParts[1]), statusLineParts[2]);
+            // Process the status line
+            String[] statusLineParts = line.split(" ", 3);
+            HttpProtocol httpProtocol = HttpProtocol.read(statusLineParts[0]);
+            ResponseCode code = ResponseCode.fromCodeAndMessage(Integer.parseInt(statusLineParts[1]), statusLineParts[2]);
 
-        // Read headers
-        while (!(line = reader.readLine()).isEmpty()) {
-            String[] headerParts = line.split(": ", 2);
-            headers.add(headerParts[0], headerParts[1]);
+            // Read headers
+            while (!(line = reader.readLine()).isEmpty()) {
+                String[] headerParts = line.split(": ", 2);
+                headers.add(headerParts[0], headerParts[1]);
+            }
+
+            // Read body
+            Content content = readContent(reader, headers);
+
+            return HttpResponse.builder()
+                    .code(code)
+                    .protocol(httpProtocol)
+                    .headers(headers)
+                    .content(content)
+                    .build();
+        } catch (Throwable ex) {
+            new HttpCodecException("failed response decode", ex).printStackTrace();
+            return null;
         }
-
-        // Read body
-        Content content = readContent(reader, headers);
-
-        return HttpResponse.builder()
-                .code(code)
-                .protocol(httpProtocol)
-                .headers(headers)
-                .content(content)
-                .build();
     }
 
     protected Content readContent(BufferedReader reader, Headers headers) throws IOException {

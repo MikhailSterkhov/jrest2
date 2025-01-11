@@ -30,6 +30,12 @@ public class HttpServerRepository {
     }
 
     @HttpNotAuthorized
+    @HttpRequestMapping(path = "/redirect")
+    public HttpResponse moveToGoogle(HttpRequest httpRequest) {
+        return HttpResponse.movedTemporary("https://google.com/");
+    }
+
+    @HttpNotAuthorized
     @HttpGet("/employee")
     public HttpResponse doGet(HttpRequest request) {
         Attributes attributes = request.getAttributes();
@@ -38,7 +44,7 @@ public class HttpServerRepository {
         if (!attributeIdOptional.isPresent()) {
             return HttpResponse.badRequest();
         }
-        return HttpResponse.ok(Content.fromEntity(
+        return HttpResponse.ok(Content.fromEntityJson(
                 Employee.builder()
                         .id(attributeIdOptional.get())
                         .jobInfo(EmployeeJob.builder()
@@ -65,7 +71,7 @@ public class HttpServerRepository {
             return HttpResponse.noContent();
         }
 
-        Employee employee = content.toEntity(Employee.class);
+        Employee employee = content.fromJson(Employee.class);
         System.out.println("POST " + employee);
 
         return HttpResponse.ok();

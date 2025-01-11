@@ -38,6 +38,9 @@ public class HttpResourcePath {
      * @return {@code true}, если запрашиваемый URI соответствует этому ресурсу, иначе {@code false}
      */
     boolean isExpected(String requestUri) {
+        if (full.equals("*")) {
+            return true;
+        }
         if (requestUri.contains("?")) {
             requestUri = requestUri.substring(0, requestUri.indexOf("?"));
         }

@@ -1,8 +1,8 @@
 package com.jrest.http.api.socket.codec.v1_1;
 
+import com.jrest.http.api.socket.codec.HttpCodecException;
 import com.jrest.http.api.socket.codec.HttpEncoder;
 import com.jrest.mvc.model.*;
-import lombok.SneakyThrows;
 
 import java.io.*;
 import java.util.List;
@@ -10,76 +10,80 @@ import java.util.Map;
 
 public class HttpV1_1Encoder implements HttpEncoder {
 
-    @SneakyThrows
     @Override
     public ByteArrayOutputStream encode0(HttpRequest httpRequest) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
 
-        // Write request line
-        writer.write(httpRequest.getMethod().getName() + " " + httpRequest.getPath() + " " + protocol());
-        writer.newLine();
+            // Write request line
+            writer.write(httpRequest.getMethod().getName() + " " + httpRequest.getPath() + " " + protocol());
+            writer.newLine();
 
-        // Write headers
-        for (Map.Entry<String, List<String>> header : httpRequest.getHeaders().getMap().entrySet()) {
-            for (String value : header.getValue()) {
-                writer.write(header.getKey() + ": " + value);
+            // Write headers
+            for (Map.Entry<String, List<String>> header : httpRequest.getHeaders().getMap().entrySet()) {
+                writer.write(header.getKey() + ": " + String.join(", ", header.getValue()));
                 writer.newLine();
             }
-        }
 
-        writer.newLine();
+            writer.newLine();
 
-        // Write body
-        Content content = httpRequest.getContent();
-        if (content != null && !content.isEmpty()) {
-            String contentText = content.getText();
+            // Write body
+            Content content = httpRequest.getContent();
+            if (content != null && !content.isEmpty()) {
+                String contentText = content.getText();
 
-            if (httpRequest.getHeaders().has(Headers.Def.TRANSFER_ENCODING, "chunked")) {
-                writeChunkedContent(writer, contentText);
-            } else {
-                writer.write(contentText);
+                if (httpRequest.getHeaders().has(Headers.Def.TRANSFER_ENCODING, "chunked")) {
+                    writeChunkedContent(writer, contentText);
+                } else {
+                    writer.write(contentText);
+                }
             }
-        }
 
-        writer.flush();
-        return outputStream;
+            writer.flush();
+            return outputStream;
+        } catch (Throwable ex) {
+            new HttpCodecException("failed request encode", ex).printStackTrace();
+            return null;
+        }
     }
 
-    @SneakyThrows
     @Override
     public ByteArrayOutputStream encode1(HttpResponse httpResponse) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
 
-        // Write status line
-        writer.write(protocol() + " " + httpResponse.getCode().getCode() + " " + httpResponse.getCode().getMessage());
-        writer.newLine();
+            // Write status line
+            writer.write(protocol() + " " + httpResponse.getCode().getCode() + " " + httpResponse.getCode().getMessage());
+            writer.newLine();
 
-        // Write headers
-        for (Map.Entry<String, List<String>> header : httpResponse.getHeaders().getMap().entrySet()) {
-            for (String value : header.getValue()) {
-                writer.write(header.getKey() + ": " + value);
+            // Write headers
+            for (Map.Entry<String, List<String>> header : httpResponse.getHeaders().getMap().entrySet()) {
+                writer.write(header.getKey() + ": " + String.join(", ", header.getValue()));
                 writer.newLine();
             }
-        }
 
-        writer.newLine();
+            writer.newLine();
 
-        // Write body
-        Content content = httpResponse.getContent();
-        if (content != null && !content.isEmpty()) {
-            String contentText = content.getText();
+            // Write body
+            Content content = httpResponse.getContent();
+            if (content != null && !content.isEmpty()) {
+                String contentText = content.getText();
 
-            if (httpResponse.getHeaders().has(Headers.Def.TRANSFER_ENCODING, "chunked")) {
-                writeChunkedContent(writer, contentText);
-            } else {
-                writer.write(contentText);
+                if (httpResponse.getHeaders().has(Headers.Def.TRANSFER_ENCODING, "chunked")) {
+                    writeChunkedContent(writer, contentText);
+                } else {
+                    writer.write(contentText);
+                }
             }
-        }
 
-        writer.flush();
-        return outputStream;
+            writer.flush();
+            return outputStream;
+        } catch (Throwable ex) {
+            new HttpCodecException("failed response encode", ex).printStackTrace();
+            return null;
+        }
     }
 
     protected void writeChunkedContent(BufferedWriter writer, String content) throws IOException {
