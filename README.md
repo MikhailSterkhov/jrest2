@@ -5,7 +5,7 @@
 <br>
 
 <img src="https://img.shields.io/badge/language-Java-red?style=flat" />
-<img src="https://img.shields.io/badge/snapshot-1.4-gree?style=flat" />
+<img src="https://img.shields.io/badge/release-1.3-gree?style=flat" />
 <img src="https://img.shields.io/badge/repository-jitpack.io-gold?style=flat" />
 <img src="https://img.shields.io/badge/build-maven-blue?style=flat" />
 
