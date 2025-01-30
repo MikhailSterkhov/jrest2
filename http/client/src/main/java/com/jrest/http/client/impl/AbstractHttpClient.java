@@ -6,6 +6,9 @@ import com.jrest.mvc.model.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -20,6 +23,17 @@ public abstract class AbstractHttpClient implements HttpClient {
         if (httpRequest == null) {
             return Optional.empty();
         }
+        if (httpRequest.getLocalAddress() == null) {
+            try {
+                httpRequest = httpRequest.toBuilder().localAddress(new InetSocketAddress(InetAddress.getLocalHost(), 0)).build();
+            } catch (UnknownHostException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        if (httpRequest.getRemoteAddress() == null) {
+            httpRequest = httpRequest.toBuilder().remoteAddress(httpRequest.getLocalAddress()).build();
+        }
+
         ClientHttpRequest clientHttpRequest = this.create(httpRequest);
         return clientHttpRequest.execute();
     }

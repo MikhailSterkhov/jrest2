@@ -170,6 +170,32 @@ public class HttpClients {
     }
 
     /**
+     * Создает HTTP клиент на основе URL соединения
+     *
+     * @param connectTimeout  таймаут подключения к URL
+     * @return экземпляр HTTP клиента
+     */
+    public HttpClient createClient(int connectTimeout) {
+        return DefaultHttpClient.builder()
+                .connectTimeout(connectTimeout)
+                .build();
+    }
+
+    /**
+     * Создает HTTP клиент на основе URL соединения
+     *
+     * @param connectTimeout  таймаут подключения к URL
+     * @param readTimeout     таймаут чтения с потока соединения
+     * @return экземпляр HTTP клиента
+     */
+    public HttpClient createClient(int connectTimeout, int readTimeout) {
+        return DefaultHttpClient.builder()
+                .connectTimeout(connectTimeout)
+                .readTimeout(readTimeout)
+                .build();
+    }
+
+    /**
      * Создает HTTP клиент на основе URL соединения без указанного исполнителя.
      *
      * @return экземпляр HTTP клиента

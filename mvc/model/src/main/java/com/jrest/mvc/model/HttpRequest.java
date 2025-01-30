@@ -3,6 +3,10 @@ package com.jrest.mvc.model;
 import com.jrest.mvc.model.util.UrlPathUtil;
 import lombok.*;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+
 /**
  * Класс представляет собой HTTP запрос.
  * <p>
@@ -24,6 +28,9 @@ public class HttpRequest {
     private Attributes attributes;
     private Content content;
     private Headers headers;
+
+    private InetSocketAddress localAddress;
+    private InetSocketAddress remoteAddress;
 
     /**
      * Возвращает путь из URL запроса.

@@ -126,7 +126,11 @@ public class HttpServerSocketChannel {
                 HttpRequest request = codec.decode0(responseStream);
 
                 HttpConnectedClient clientChannel = new HttpConnectedClient(socket, codec, config);
-                requestHandler.accept(clientChannel, request);
+
+                requestHandler.accept(clientChannel, request.toBuilder()
+                        .localAddress((InetSocketAddress) socket.getLocalSocketAddress())
+                        .remoteAddress((InetSocketAddress) socket.getRemoteSocketAddress())
+                        .build());
 
             } catch (IOException e) {
                 e.printStackTrace();

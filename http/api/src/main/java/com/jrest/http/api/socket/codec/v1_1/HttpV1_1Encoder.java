@@ -2,46 +2,24 @@ package com.jrest.http.api.socket.codec.v1_1;
 
 import com.jrest.http.api.socket.codec.HttpCodecException;
 import com.jrest.http.api.socket.codec.HttpEncoder;
+import com.jrest.http.api.socket.codec.EncodingStream;
 import com.jrest.mvc.model.*;
 
 import java.io.*;
-import java.util.List;
-import java.util.Map;
 
 public class HttpV1_1Encoder implements HttpEncoder {
 
     @Override
     public ByteArrayOutputStream encode0(HttpRequest httpRequest) {
         try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+            EncodingStream encodingStream = new EncodingStream(protocol());
 
-            // Write request line
-            writer.write(httpRequest.getMethod().getName() + " " + httpRequest.getPath() + " " + protocol());
-            writer.newLine();
+            encodingStream.writeStatusLine(httpRequest);
+            encodingStream.writeHeaders(httpRequest.getHeaders());
 
-            // Write headers
-            for (Map.Entry<String, List<String>> header : httpRequest.getHeaders().getMap().entrySet()) {
-                writer.write(header.getKey() + ": " + String.join(", ", header.getValue()));
-                writer.newLine();
-            }
+            encodingStream.writeContent(httpRequest.getContent(), httpRequest.getHeaders());
 
-            writer.newLine();
-
-            // Write body
-            Content content = httpRequest.getContent();
-            if (content != null && !content.isEmpty()) {
-                String contentText = content.getText();
-
-                if (httpRequest.getHeaders().has(Headers.Def.TRANSFER_ENCODING, "chunked")) {
-                    writeChunkedContent(writer, contentText);
-                } else {
-                    writer.write(contentText);
-                }
-            }
-
-            writer.flush();
-            return outputStream;
+            return encodingStream.toOutputStream();
         } catch (Throwable ex) {
             new HttpCodecException("failed request encode", ex).printStackTrace();
             return null;
@@ -51,56 +29,18 @@ public class HttpV1_1Encoder implements HttpEncoder {
     @Override
     public ByteArrayOutputStream encode1(HttpResponse httpResponse) {
         try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+            EncodingStream encodingStream = new EncodingStream(protocol());
 
-            // Write status line
-            writer.write(protocol() + " " + httpResponse.getCode().getCode() + " " + httpResponse.getCode().getMessage());
-            writer.newLine();
+            encodingStream.writeStatusLine(httpResponse);
+            encodingStream.writeHeaders(httpResponse.getHeaders());
 
-            // Write headers
-            for (Map.Entry<String, List<String>> header : httpResponse.getHeaders().getMap().entrySet()) {
-                writer.write(header.getKey() + ": " + String.join(", ", header.getValue()));
-                writer.newLine();
-            }
+            encodingStream.writeContent(httpResponse.getContent(), httpResponse.getHeaders());
 
-            writer.newLine();
-
-            // Write body
-            Content content = httpResponse.getContent();
-            if (content != null && !content.isEmpty()) {
-                String contentText = content.getText();
-
-                if (httpResponse.getHeaders().has(Headers.Def.TRANSFER_ENCODING, "chunked")) {
-                    writeChunkedContent(writer, contentText);
-                } else {
-                    writer.write(contentText);
-                }
-            }
-
-            writer.flush();
-            return outputStream;
+            return encodingStream.toOutputStream();
         } catch (Throwable ex) {
             new HttpCodecException("failed response encode", ex).printStackTrace();
             return null;
         }
-    }
-
-    protected void writeChunkedContent(BufferedWriter writer, String content) throws IOException {
-        int chunkSize = 1024; // Define chunk size
-        int offset = 0;
-        while (offset < content.length()) {
-            int end = Math.min(content.length(), offset + chunkSize);
-            String chunk = content.substring(offset, end);
-            writer.write(Integer.toHexString(chunk.length()));
-            writer.newLine();
-            writer.write(chunk);
-            writer.newLine();
-            offset += chunkSize;
-        }
-        writer.write("0");
-        writer.newLine();
-        writer.newLine(); // End of chunks
     }
 
     @Override

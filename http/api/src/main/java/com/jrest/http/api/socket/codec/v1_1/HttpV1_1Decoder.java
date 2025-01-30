@@ -7,6 +7,7 @@ import com.jrest.mvc.model.*;
 import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -83,15 +84,27 @@ public class HttpV1_1Decoder implements HttpDecoder {
     }
 
     protected Content readContent(BufferedReader reader, Headers headers) throws IOException {
+        String contentText;
         if (headers.has(Headers.Def.TRANSFER_ENCODING, "chunked")) {
-            return readChunkedContent(reader);
+            contentText = readChunkedContent(reader);
         } else {
             // Handle other encodings if necessary
-            return Content.fromText(reader.lines().collect(Collectors.joining("\n")));
+            contentText = reader.lines().collect(Collectors.joining("\n"));
         }
+        return Content.builder()
+                .text(contentText)
+                .contentLength(Optional.ofNullable(headers.getLast(Headers.Def.CONTENT_LENGTH))
+                        .map(Integer::parseInt)
+                        .orElse(Optional.ofNullable(contentText)
+                                .map(string -> string.getBytes().length)
+                                .orElse(0)))
+                .contentType(Optional.ofNullable(headers.getLast(Headers.Def.CONTENT_TYPE))
+                        .map(ContentType::fromString)
+                        .orElse(ContentType.APPLICATION_FORM_URLENCODED))
+                .build();
     }
 
-    protected Content readChunkedContent(BufferedReader reader) throws IOException {
+    protected String readChunkedContent(BufferedReader reader) throws IOException {
         StringBuilder contentBuilder = new StringBuilder();
         String line;
 
@@ -106,7 +119,7 @@ public class HttpV1_1Decoder implements HttpDecoder {
             reader.readLine();
         }
 
-        return Content.fromText(contentBuilder.toString());
+        return contentBuilder.toString();
     }
 
     protected Attributes parseAttributes(String url) throws IOException {

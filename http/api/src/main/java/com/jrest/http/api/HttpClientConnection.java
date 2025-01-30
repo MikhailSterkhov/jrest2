@@ -76,7 +76,7 @@ public class HttpClientConnection {
         try {
             return InputStreamUtil.toString(connection.getInputStream());
         } catch (IOException exception) {
-            return "";
+            return exception.toString();
         }
     }
 

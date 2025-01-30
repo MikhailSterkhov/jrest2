@@ -66,7 +66,7 @@ public class HttpClientSocketChannel {
             if (!headers.has(Headers.Def.CONTENT_TYPE)) {
                 headers.add(Headers.Def.CONTENT_TYPE, content.getContentType());
             }
-            if (!headers.has(Headers.Def.CONTENT_LENGTH)) {
+            if (!headers.has(Headers.Def.CONTENT_LENGTH) && !headers.has(Headers.Def.TRANSFER_ENCODING, "chunked")) {
                 headers.add(Headers.Def.CONTENT_LENGTH, content.getContentLength());
             }
         }
@@ -125,18 +125,19 @@ public class HttpClientSocketChannel {
             socket.setSoTimeout(config.getTimeout());
 
             // Encode request and send it
-            ByteArrayOutputStream encodedRequest = codec.encode0(httpRequest);
+            try (ByteArrayOutputStream encodedRequest = codec.encode0(httpRequest)) {
 
-            OutputStream outputStream = socket.getOutputStream();
-            outputStream.write(encodedRequest.toByteArray());
-            outputStream.flush();
+                OutputStream outputStream = socket.getOutputStream();
+                outputStream.write(encodedRequest.toByteArray());
+                outputStream.flush();
+            }
 
             // Decode response
             InputStream inputStream = socket.getInputStream();
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
             int read = inputStream.read();
-            byte[] bytesArray = InputStreamUtil.toBytesArray(inputStream, inputStream.available());
+            byte[] bytesArray = InputStreamUtil.toBytesArray(inputStream);
 
             byteArrayOutputStream.write(read);
             byteArrayOutputStream.write(bytesArray);

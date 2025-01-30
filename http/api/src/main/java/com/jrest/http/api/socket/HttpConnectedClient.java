@@ -53,7 +53,7 @@ public class HttpConnectedClient {
             if (!headers.has(Headers.Def.CONTENT_TYPE)) {
                 headers.add(Headers.Def.CONTENT_TYPE, content.getContentType());
             }
-            if (!headers.has(Headers.Def.CONTENT_LENGTH)) {
+            if (!headers.has(Headers.Def.CONTENT_LENGTH) && !headers.has(Headers.Def.TRANSFER_ENCODING, "chunked")) {
                 headers.add(Headers.Def.CONTENT_LENGTH, content.getContentLength());
             }
         }
@@ -62,10 +62,11 @@ public class HttpConnectedClient {
     public void sendResponse(HttpResponse response) throws IOException {
         prepareHeaders(response);
 
-        ByteArrayOutputStream encodedResponse = codec.encode1(response);
+        try (ByteArrayOutputStream encodedResponse = codec.encode1(response)) {
 
-        OutputStream outputStream = socket.getOutputStream();
-        outputStream.write(encodedResponse.toByteArray());
-        outputStream.flush();
+            OutputStream outputStream = socket.getOutputStream();
+            outputStream.write(encodedResponse.toByteArray());
+            outputStream.flush();
+        }
     }
 }

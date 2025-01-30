@@ -3,7 +3,6 @@ package com.jrest.mvc.model.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.jrest.mvc.model.Content;
 import com.jrest.mvc.model.ContentDisposition;
 import com.jrest.mvc.model.ContentType;
@@ -13,6 +12,7 @@ import lombok.experimental.UtilityClass;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.function.UnaryOperator;
 
 /**
  * Утилитарный класс для работы с содержимым (Content) и мультипартными данными.
@@ -20,13 +20,20 @@ import java.nio.charset.StandardCharsets;
 @UtilityClass
 public class ContentUtil {
 
-    private static final Gson GSON = new GsonBuilder().setLenient().create();
-
-    private static final XmlMapper XML_MAPPER = new XmlMapper();
+    private static Gson GSON = new Gson();
+    private static XmlMapper XML_MAPPER = new XmlMapper();
 
     private static final String MULTIPART_BEGIN = "--===\r\n";
     private static final String MULTIPART_SPLITERATOR = "\r\n";
     private static final String MULTIPART_END = "--===--\r\n";
+
+    public void editGson(UnaryOperator<Gson> updater) {
+        GSON = updater.apply(GSON);
+    }
+
+    public void editXmlMapper(UnaryOperator<XmlMapper> updater) {
+        XML_MAPPER = updater.apply(XML_MAPPER);
+    }
 
     /**
      * Преобразует массив байтов в строку UTF-8.

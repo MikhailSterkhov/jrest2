@@ -1,7 +1,9 @@
 package com.jrest.mvc.model.util;
 
+import com.jrest.mvc.model.HttpRestException;
 import lombok.experimental.UtilityClass;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,11 +40,19 @@ public class InputStreamUtil {
      * @throws RuntimeException если происходит IOException при чтении из InputStream
      */
     public byte[] toBytesArray(InputStream inputStream) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int length;
+
         try {
-            return toBytesArray(inputStream, inputStream.available());
-        } catch (IOException exception) {
-            throw new RuntimeException(exception);
+            while ((length = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, length);
+            }
+        } catch (IOException e) {
+            throw new HttpRestException(e);
         }
+
+        return outputStream.toByteArray();
     }
 
     /**
@@ -53,13 +63,18 @@ public class InputStreamUtil {
      * @throws RuntimeException если происходит IOException при чтении из InputStream
      */
     public byte[] toBytesArray(InputStream inputStream, int length) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[length];
+
         try {
-            byte[] bytes = new byte[length];
-            inputStream.read(bytes);
-            return bytes;
-        } catch (IOException exception) {
-            throw new RuntimeException(exception);
+            while ((length = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, length);
+            }
+        } catch (IOException e) {
+            throw new HttpRestException(e);
         }
+
+        return outputStream.toByteArray();
     }
 
     /**
